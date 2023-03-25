@@ -9,9 +9,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationUserDto {
+public class CreateUpdateUserDto {
 
     private String login;
+
+    private String password;
 
     private String name;
 
