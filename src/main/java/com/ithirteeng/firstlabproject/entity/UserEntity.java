@@ -5,12 +5,12 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+@Entity
+@Table(name = "users_table")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "user")
 public class UserEntity {
     @Id
     @Column(name = "id")

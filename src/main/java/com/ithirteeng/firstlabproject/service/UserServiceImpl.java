@@ -19,10 +19,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto getUserByLogin(String login) throws BadRequestException {
-        if (!repository.checkIdLoginExists(login)) {
+        if (!repository.existsByLogin(login)) {
             throw new BadRequestException("400: User doesn't exist");
         } else {
-            var userEntity = repository.getUserByLogin(login);
+            var userEntity = repository.findByLogin(login);
             return UserMapper.entityToDto(userEntity);
         }
 
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String registerUser(CreateUpdateUserDto createUpdateUserDto) throws ConflictException {
         var userEntity = UserMapper.newUserToEntity(createUpdateUserDto);
-        if (!repository.checkIdLoginExists(userEntity.getLogin())) {
+        if (repository.existsByLogin(userEntity.getLogin())) {
             throw new ConflictException("409: User already exists!");
         } else {
             repository.save(userEntity);
@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     @Override
     public String updateUserData(CreateUpdateUserDto createUpdateUserDto, String id) throws BadRequestException {
         var userEntity = repository.findById(id)
@@ -49,7 +50,9 @@ public class UserServiceImpl implements UserService {
         userEntity.setSurname(createUpdateUserDto.getSurname());
         userEntity.setPatronymic(createUpdateUserDto.getPatronymic());
         userEntity.setBirthDate(createUpdateUserDto.getBirthDate());
+
         repository.save(userEntity);
+
         return "User updated!";
     }
 }
