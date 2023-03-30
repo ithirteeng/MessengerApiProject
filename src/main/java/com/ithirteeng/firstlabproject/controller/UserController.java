@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/registration")
-    public ResponseEntity<String> registerUser(@RequestBody CreateUpdateUserDto dto) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody CreateUpdateUserDto dto) {
         try {
             return ResponseEntity.ok(userService.registerUser(dto));
         } catch (Exception e) {
@@ -25,7 +27,7 @@ public class UserController {
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<String> editUserData(@RequestBody CreateUpdateUserDto dto, @PathVariable String id) {
+    public ResponseEntity<String> editUserData(@Valid @RequestBody CreateUpdateUserDto dto, @PathVariable String id) {
         try {
             return ResponseEntity.ok(userService.updateUserData(dto, id));
         } catch (Exception e) {
@@ -34,7 +36,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> getUserDataByLogin(@RequestBody LoginUserDto dto) {
+    public ResponseEntity<?> getUserDataByLogin(@Valid @RequestBody LoginUserDto dto) {
         try {
             return ResponseEntity.ok(userService.getUserByLogin(dto.getLogin()));
         } catch (Exception e) {
