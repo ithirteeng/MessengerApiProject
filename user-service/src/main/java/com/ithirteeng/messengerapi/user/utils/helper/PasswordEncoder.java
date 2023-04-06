@@ -5,7 +5,7 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 public class PasswordEncoder {
 
     private static final Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(
-            32, 64, 1, 15 * 1024, 2
+            16, 32, 1, 65536, 10
     );
 
     public static String encodePassword(String password) {
