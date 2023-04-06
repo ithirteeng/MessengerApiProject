@@ -1,13 +1,14 @@
-package com.ithirteeng.messengerapi;
+package com.ithirteeng.messengerapi.user;
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MessengerApiApplication {
+public class UserServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MessengerApiApplication.class, args);
+        SpringApplication.run(UserServerApplication.class, args);
     }
 
 }

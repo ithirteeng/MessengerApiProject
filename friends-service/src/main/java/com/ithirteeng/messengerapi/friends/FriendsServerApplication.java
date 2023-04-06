@@ -1,13 +1,13 @@
-package com.ithirteeng.firstlabproject;
+package com.ithirteeng.messengerapi.friends;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FirstLabProjectApplication {
+public class FriendsServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(FirstLabProjectApplication.class, args);
+        SpringApplication.run(FriendsServerApplication.class, args);
     }
 
 }
