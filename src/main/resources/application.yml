@@ -1,13 +1,1 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/back_hits_db
-    username: hits_user
-    password: hits
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-
-server:
-  port: 1309
 
