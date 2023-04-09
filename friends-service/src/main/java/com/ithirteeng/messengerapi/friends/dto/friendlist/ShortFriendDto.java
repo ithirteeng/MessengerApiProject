@@ -13,11 +13,10 @@ import java.util.UUID;
 @Setter
 @Builder
 public class ShortFriendDto {
+
     private Date addFriendDate;
 
     private Date deleteFriendDate;
-
-    private UUID targetUserId;
 
     private UUID addingUserId;
 
