@@ -3,7 +3,7 @@ package com.ithirteeng.messengerapi.user.mapper;
 import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
 import com.ithirteeng.messengerapi.user.dto.UserDto;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
-import com.ithirteeng.messengerapi.user.utils.helper.PasswordEncoder;
+import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -26,7 +26,7 @@ public class UserMapper {
                 .login(registrationDto.getLogin())
                 .email(registrationDto.getEmail())
                 .city(registrationDto.getCity())
-                .password(PasswordEncoder.encodePassword(registrationDto.getPassword()))
+                .password(PasswordHelper.encodePassword(registrationDto.getPassword()))
                 .registrationDate(new Date())
                 .telephoneNumber(registrationDto.getTelephoneNumber())
                 .avatarId(registrationDto.getAvatarId())

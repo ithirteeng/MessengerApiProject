@@ -9,7 +9,7 @@ import com.ithirteeng.messengerapi.user.dto.UserDto;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.repository.UserRepository;
-import com.ithirteeng.messengerapi.user.utils.helper.PasswordEncoder;
+import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +64,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDto postLogin(LoginDto loginDto) {
         var entity = getUserByLogin(loginDto.getLogin());
-        if (!PasswordEncoder.isPasswordValid(loginDto.getPassword(), entity.getPassword())) {
+        if (!PasswordHelper.isPasswordValid(loginDto.getPassword(), entity.getPassword())) {
             throw new BadRequestException("Неверный пароль");
         } else {
             return UserMapper.entityToUserDto(entity);
