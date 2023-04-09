@@ -2,7 +2,7 @@ package com.ithirteeng.messengerapi.friends.dto.friendlist;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
@@ -11,9 +11,9 @@ import java.util.UUID;
 @Getter
 @Setter
 public class DeleteFriendDto {
-    @NotBlank(message = "Id целевого пользователя обязателен!")
+    @NotNull(message = "Id целевого пользователя обязателен!")
     private UUID targetUserId;
 
-    @NotBlank(message = "Id внешнего пользователя обязателен!")
+    @NotNull(message = "Id внешнего пользователя обязателен!")
     private UUID externalUserId;
 }
