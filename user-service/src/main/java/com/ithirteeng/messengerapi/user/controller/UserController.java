@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.user.controller;
 
+import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.user.dto.GetProfileDto;
 import com.ithirteeng.messengerapi.user.dto.LoginDto;
 import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
@@ -14,11 +15,13 @@ import org.springframework.web.bind.annotation.*;
  * RestController для user - модуля
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    private final SecurityProps securityProps;
 
     @PostMapping("/registration")
     public UserDto registerUser(@Validated @RequestBody RegistrationDto registrationDto) {
@@ -33,6 +36,15 @@ public class UserController {
     @GetMapping("/profile")
     public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto) {
         return UserMapper.entityToUserDto(userService.getUserByLogin(dto.getLogin()));
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        try {
+            return securityProps.getIntegrations().getRootPath();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
 
     }
 }
