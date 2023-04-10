@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("app.security")
+@ConfigurationProperties("app")
 @Getter
 @Setter
 @ToString

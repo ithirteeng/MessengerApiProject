@@ -1,5 +1,5 @@
 server:
-  port: 1309
+  port: 1305
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/users_service_db

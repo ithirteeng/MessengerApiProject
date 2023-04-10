@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * RestController для user - модуля
  */
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
