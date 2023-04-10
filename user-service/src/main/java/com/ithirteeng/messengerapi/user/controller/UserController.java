@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.user.controller;
 
+import com.ithirteeng.messengerapi.common.exception.UnauthorizedException;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.user.dto.GetProfileDto;
 import com.ithirteeng.messengerapi.user.dto.LoginDto;
@@ -31,11 +32,16 @@ public class UserController {
     @PostMapping("/login")
     public UserDto loginUser(@Validated @RequestBody LoginDto loginDto) {
         return userService.postLogin(loginDto);
+
     }
 
     @GetMapping("/profile")
     public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto) {
-        return UserMapper.entityToUserDto(userService.getUserByLogin(dto.getLogin()));
+        try {
+            return UserMapper.entityToUserDto(userService.getUserByLogin(dto.getLogin()));
+        } catch (Error e) {
+            throw new UnauthorizedException(e.getMessage());
+        }
     }
 
     @GetMapping("/test")

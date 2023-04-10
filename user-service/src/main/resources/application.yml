@@ -1,5 +1,5 @@
 server:
-  port: 1305
+  port: 1301
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/users_service_db
@@ -13,8 +13,8 @@ spring:
 app:
   jwt-token:
     permit-all:
-      - /api/user/registration
-      - /api/user/login
+      - /api/users/registration
+      - /api/users/login
     root-path: /api
     secret: qwerqwerqwerqwetruiqywterqiuwyertqiwueyrtqwiueyrtqwuieyrtqwiueyrtqwuerqqqwyeurtqiwuyertqiuwyetrqiuwyetrqiuwyetrqwuiyertqwuyiertqwuiyertqwuiyertqwuieytrquwyetruqiwyetruiqwyretiuqywetuqwyetuqwyretqiuwyretqiwueyrtqiuwerytqiwueyrtqiuweyrtqwuieyrtqwueiyrtqweuir
     expiration: 50000

@@ -1,8 +1,8 @@
 app:
   jwt-token:
     permit-all:
-      - /api/user/registration
-      - /api/user/login
+      - /api/users/registration
+      - /api/users/login
     root-path: /api
     secret: qwerqwerqwerqwetruiqywterqiuwyertqiwueyrtqwiueyrtqwuieyrtqwiueyrtqwuerqqqwyeurtqiwuyertqiuwyetrqiuwyetrqiuwyetrqwuiyertqwuyiertqwuiyertqwuiyertqwuieytrquwyetruqiwyetruiqwyretiuqywetuqwyetuqwyretqiuwyretqiwueyrtqiuwerytqiwueyrtqiuweyrtqwuieyrtqwueiyrtqweuir
     expiration: 50000

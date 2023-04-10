@@ -3,6 +3,7 @@ package com.ithirteeng.messengerapi.user.controller;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.exception.UnauthorizedException;
 import com.ithirteeng.messengerapi.common.model.ApiErrorModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -60,6 +61,25 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(
                 new ApiErrorModel(exception.getMessage(), HttpStatus.CONFLICT.value()),
                 HttpStatus.CONFLICT
+        );
+    }
+
+    /**
+     * Метод для отлавливания всех {@link UnauthorizedException}.
+     *
+     * @param exception исключение.
+     * @param request   запрос, в ходе выполнения которого возникло исключение.
+     * @return объект класса {@link ApiErrorModel} со статус кодом 401.
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    protected ResponseEntity<Object> handleUnauthorizedException(
+            UnauthorizedException exception,
+            WebRequest request
+    ) {
+        logError(request, exception);
+        return new ResponseEntity<>(
+                new ApiErrorModel(exception.getMessage(), HttpStatus.UNAUTHORIZED.value()),
+                HttpStatus.UNAUTHORIZED
         );
     }
 
@@ -128,7 +148,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     /**
      * Метод для логирования ошибок, доходящих до контроллера
      *
-     * @param request запрос, в ходе выполнения которого возникло исключение
+     * @param request   запрос, в ходе выполнения которого возникло исключение
      * @param exception исключение
      */
     private void logError(WebRequest request, Exception exception) {
