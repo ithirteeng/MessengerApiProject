@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * DTO для запроса списка пользователей по параметрам
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

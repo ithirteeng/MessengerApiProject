@@ -1,4 +1,4 @@
-package com.ithirteeng.messengerapi.user.service;
+package com.ithirteeng.messengerapi.common.service;
 
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;

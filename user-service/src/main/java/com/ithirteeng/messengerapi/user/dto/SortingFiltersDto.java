@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * DTO для фильтров сортировки
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

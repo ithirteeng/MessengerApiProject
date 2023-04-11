@@ -50,6 +50,16 @@ public class UserEntity {
     @Column(name = "avatar_id")
     private UUID avatarId;
 
+    /**
+     * Конструктор для параметров сортировки
+     *
+     * @param fullName ФИО
+     * @param login логин
+     * @param email емэйл
+     * @param city город
+     * @param birthDate дата рождения
+     * @param telephoneNumber номер телефона
+     */
     private UserEntity(String fullName, String login, String email, String city, Date birthDate, String telephoneNumber) {
         this.fullName = fullName;
         this.login = login;
@@ -59,6 +69,18 @@ public class UserEntity {
         this.telephoneNumber = telephoneNumber;
     }
 
+    /**
+     * Функция для получения экземпляра {@link UserEntity} для создания объекта {@link org.springframework.data.domain.Example}
+     *
+     * @param fullName ФИО
+     * @param login логин
+     * @param email емэйл
+     * @param city город
+     * @param birthDate дата рождения
+     * @param telephoneNumber номер телефона
+     *
+     * @return {@link UserEntity}
+     */
     public static UserEntity from(String fullName, String login, String email, String city, Date birthDate, String telephoneNumber) {
         return new UserEntity(fullName, login, email, city, birthDate, telephoneNumber);
     }

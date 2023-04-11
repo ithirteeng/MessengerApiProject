@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 
+/**
+ * DTO для полей сортировки
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

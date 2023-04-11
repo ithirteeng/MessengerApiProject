@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * DTO для вывода списка пользователей и информации о пагинации
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

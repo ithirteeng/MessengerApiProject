@@ -1,7 +1,6 @@
 package com.ithirteeng.messengerapi.user.controller;
 
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
-import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.user.dto.*;
 import com.ithirteeng.messengerapi.user.mapper.PageMapper;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
@@ -26,8 +25,6 @@ public class UserController {
     private final UserService userService;
 
     private final AuthenticationService authenticationService;
-
-    private final SecurityProps securityProps;
 
     @PostMapping("/registration")
     public ResponseEntity<UserDto> registerUser(@Validated @RequestBody RegistrationDto registrationDto) {

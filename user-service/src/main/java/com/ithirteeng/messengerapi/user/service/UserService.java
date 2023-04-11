@@ -3,6 +3,8 @@ package com.ithirteeng.messengerapi.user.service;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
+import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
 import com.ithirteeng.messengerapi.user.dto.*;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
@@ -22,6 +24,7 @@ import java.util.UUID;
  * Сервис для работы с данными о юзере
  */
 @Service
+@EnablePaginationService
 @RequiredArgsConstructor
 public class UserService {
 
@@ -109,6 +112,13 @@ public class UserService {
         return UserMapper.entityToUserDto(entity);
     }
 
+    /**
+     * Метод для получения данных по объекту класса {@link SortingDto} для пагинации
+     *
+     * @param sortingDto объект класса {@link SortingDto}
+     * @return {@link Page<UserDto>}
+     * @throws BadRequestException при номере страницы не должен превышать общее число онных - 1
+     */
     @Transactional
     public Page<UserDto> getUsersList(SortingDto sortingDto) {
         var pageInfo = sortingDto.getPageInfo();
@@ -130,7 +140,7 @@ public class UserService {
         Page<UserEntity> users = repository.findAll(example, pageable);
 
         if (users.getTotalPages() <= pageInfo.getPageNumber()) {
-            throw new BadRequestException("Номер страницы не должен превышать общее число онных");
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
         }
         return users.map(UserMapper::entityToUserDto);
     }

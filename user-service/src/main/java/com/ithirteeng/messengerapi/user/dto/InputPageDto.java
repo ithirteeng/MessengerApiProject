@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO для установки данных для пагинации
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
