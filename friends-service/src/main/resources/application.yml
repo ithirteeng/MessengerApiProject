@@ -1,2 +1,12 @@
 server:
-  port: 8010
+  port: 1308
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: ithirteeng
+    password: ithirteeng
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
