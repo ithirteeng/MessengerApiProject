@@ -1,15 +1,13 @@
 package com.ithirteeng.messengerapi.user.controller;
 
-import com.ithirteeng.messengerapi.common.exception.BadRequestException;
-import com.ithirteeng.messengerapi.common.exception.ConflictException;
-import com.ithirteeng.messengerapi.common.exception.NotFoundException;
-import com.ithirteeng.messengerapi.common.exception.UnauthorizedException;
+import com.ithirteeng.messengerapi.common.exception.*;
 import com.ithirteeng.messengerapi.common.model.ApiErrorModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +15,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,28 +99,12 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
             WebRequest request
     ) {
         logError(request, exception);
-
-        Map<String, List<String>> errorsMap = new HashMap<>();
-        exception
-                .getBindingResult()
-                .getAllErrors()
-                .forEach(error -> {
-                    String fieldName = ((FieldError) error).getField();
-                    String message = error.getDefaultMessage();
-
-                    if (message != null) {
-                        if (errorsMap.containsKey(fieldName)) {
-                            errorsMap.get(fieldName).add(message);
-                        } else {
-                            List<String> newErrorList = new ArrayList<>();
-                            newErrorList.add(message);
-
-                            errorsMap.put(fieldName, newErrorList);
-                        }
-                    }
-                });
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
+        List<String> details = new ArrayList<>();
+        for(ObjectError error : exception.getBindingResult().getAllErrors()) {
+            details.add(((FieldError) error).getField() +": " + error.getDefaultMessage());
+        }
+        ErrorResponse error = new ErrorResponse("Validation Failed", details);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     /**
