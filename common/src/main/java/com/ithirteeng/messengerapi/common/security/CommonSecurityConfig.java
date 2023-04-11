@@ -18,6 +18,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Конфиг Spring Security
+ */
 @Slf4j
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -31,6 +34,9 @@ public class CommonSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Настройка конфига для JWT
+     */
     @SneakyThrows
     @Bean
     public SecurityFilterChain setupJwtFilterChain(HttpSecurity http) {
@@ -58,6 +64,13 @@ public class CommonSecurityConfig {
                 .build();
     }
 
+    /**
+     * Метод для проверки пути сервлета
+     *
+     * @param rootPath паттерн для заданного пути
+     * @param ignore   паттерн для игнорируемых путей
+     * @return {@link RequestMatcher}
+     */
     private RequestMatcher filterPredicate(String rootPath, String... ignore) {
         return rq -> Objects.nonNull(rq.getServletPath())
                 && rq.getServletPath().startsWith(rootPath)

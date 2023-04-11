@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
@@ -88,7 +87,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
      * @param headers   заголовки, которые будут записаны в ответ.
      * @param status    выбранный статус ответа.
      * @param request   текущий запрос.
-     * @return {@link Map}, где ключ - название поля невалидного тела запроса,
+     * @return {@link ResponseEntity}, где ключ - название поля невалидного тела запроса,
      * а значение - список {@code user-friendly} сообщений об ошибке.
      */
     @Override

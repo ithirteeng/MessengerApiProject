@@ -5,6 +5,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Класс для парсинга реквизитов из application.yml
+ */
 @ConfigurationProperties("app")
 @Getter
 @Setter

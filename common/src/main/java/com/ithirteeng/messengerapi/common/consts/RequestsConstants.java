@@ -1,7 +1,10 @@
-package com.ithirteeng.messengerapi.common.security.consts;
+package com.ithirteeng.messengerapi.common.consts;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * Класс констант для запросов
+ */
 @UtilityClass
 public class RequestsConstants {
     public static final String AUTHORIZATION_HEADER = "Authorization";

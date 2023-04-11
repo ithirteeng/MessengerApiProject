@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Кастомная ошибка для вывода невалидных данных
+ */
 @NoArgsConstructor
 @Getter
 @Setter

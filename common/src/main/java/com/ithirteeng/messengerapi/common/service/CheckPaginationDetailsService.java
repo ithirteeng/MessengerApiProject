@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервис для пагинации
+ */
 @Service
 @RequiredArgsConstructor
 public class CheckPaginationDetailsService {
