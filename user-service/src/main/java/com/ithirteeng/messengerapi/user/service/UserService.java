@@ -34,7 +34,7 @@ public class UserService {
      * @throws NotFoundException возникает при несуществующем id пользователя
      */
     @Transactional(readOnly = true)
-    public UserEntity getUserEntityById(UUID id) {
+    public UserEntity findUserEntityById(UUID id) {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователся с таким id " + id + " не существует"));
@@ -95,7 +95,7 @@ public class UserService {
      *
      * @param updateProfileDto DTO с данными для Изменения профиля
      * @return объект типа {@link UserDto}
-     * @throws ConflictException возникает при уже существующих email или login
+     * @throws NotFoundException возникает при несуществующем пользователе
      */
     @Transactional
     public UserDto updateProfile(UpdateProfileDto updateProfileDto, String login) {

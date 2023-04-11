@@ -49,6 +49,12 @@ public class UserController {
         return UserMapper.entityToUserDto(userService.getUserByLogin(dto.getLogin()));
     }
 
+    @GetMapping("/me")
+    public UserDto getUserData(Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return UserMapper.entityToUserDto(userService.findUserEntityById(userData.getId()));
+    }
+
     @PutMapping("/profile/change")
     public UserDto changeProfileData(
             @Validated @RequestBody UpdateProfileDto updateProfileDto,
