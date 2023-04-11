@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import static com.ithirteeng.messengerapi.common.security.consts.RequestsConstants.AUTHORIZATION_HEADER;
 import static com.ithirteeng.messengerapi.common.security.consts.RequestsConstants.BEARER_PREFIX;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
@@ -30,24 +32,35 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
-    ) throws ServletException, IOException, UnauthorizedException {
+    ) throws ServletException, IOException {
         var bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
         if (bearerToken == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            throw new UnauthorizedException("Отсутсвует хэдер Authorization!");
+            logError(request, new UnauthorizedException("Отсутсвует хэдер Authorization!"));
         } else if (!bearerToken.contains(BEARER_PREFIX)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            throw new UnauthorizedException("Формат аутентификации должен быть Bearer token!");
+            logError(request, new UnauthorizedException("Отсутсвует хэдер Authorization!"));
+        } else {
+            var jwtToken = "";
+            try {
+                jwtToken = bearerToken.substring(7);
+            } catch (Exception e) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                logError(request, e);
+            }
+            try {
+                var userData = parseToken(jwtToken);
+
+                var authentication = new JwtAuthentication(userData);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                filterChain.doFilter(request, response);
+            } catch (Exception e) {
+                logError(request, e);
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            }
         }
-
-        var jwtToken = bearerToken.substring(7);
-
-        var userData = parseToken(jwtToken);
-
-        var authentication = new JwtAuthentication(userData);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        filterChain.doFilter(request, response);
     }
 
     private JwtUserDetails parseToken(String jwtToken) throws UnauthorizedException {
@@ -66,9 +79,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     String.valueOf(data.getBody().get("fullName"))
             );
         } catch (JwtException e) {
-            throw new UnauthorizedException(e.getMessage());
+            throw new UnauthorizedException("Токен невалиден");
         }
 
         return userData;
+    }
+
+    private void logError(HttpServletRequest request, Exception exception) {
+        log.error("Произошла ошибка на запросе {}", request.getRequestURL());
+        log.error(exception.getMessage(), exception);
     }
 }

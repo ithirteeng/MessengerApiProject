@@ -1,6 +1,7 @@
 package com.ithirteeng.messengerapi.user.mapper;
 
 import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
+import com.ithirteeng.messengerapi.user.dto.UpdateProfileDto;
 import com.ithirteeng.messengerapi.user.dto.UserDto;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
@@ -14,6 +15,7 @@ import java.util.Date;
  */
 @Component
 public class UserMapper {
+
 
     /**
      * Метод для преобразования объектов класса {@link RegistrationDto} в объекты {@link UserEntity}
@@ -53,5 +55,28 @@ public class UserMapper {
                 .registrationDate(userEntity.getRegistrationDate())
                 .city(userEntity.getCity())
                 .build();
+    }
+
+    public static UserEntity updateUserFields(UserEntity userEntity, UpdateProfileDto updateProfileDto) {
+        return UserEntity.builder()
+                .id(userEntity.getId())
+                .login(userEntity.getLogin())
+                .email(userEntity.getEmail())
+                .fullName(updateNullProperties(updateProfileDto.getFullName(), userEntity.getFullName()))
+                .registrationDate(userEntity.getRegistrationDate())
+                .password(userEntity.getPassword())
+                .avatarId(updateProfileDto.getAvatarId())
+                .birthDate(updateProfileDto.getBirthDate())
+                .telephoneNumber(updateProfileDto.getTelephoneNumber())
+                .city(updateProfileDto.getCity())
+                .build();
+    }
+
+    private static String updateNullProperties(String updateString, String oldString) {
+        if (updateString != null) {
+            return updateString;
+        } else {
+            return oldString;
+        }
     }
 }

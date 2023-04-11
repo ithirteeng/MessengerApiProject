@@ -5,6 +5,7 @@ import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import com.ithirteeng.messengerapi.user.dto.LoginDto;
 import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
+import com.ithirteeng.messengerapi.user.dto.UpdateProfileDto;
 import com.ithirteeng.messengerapi.user.dto.UserDto;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
@@ -59,7 +60,7 @@ public class UserService {
      * @param loginDto DTO с данными для логина
      * @return объект типа {@link UserDto}
      * @throws BadRequestException возникает при неверном пароле
-     * @throws NotFoundException возникает при несущесвующем логине
+     * @throws NotFoundException   возникает при несущесвующем логине
      */
     @Transactional(readOnly = true)
     public UserDto postLogin(LoginDto loginDto) {
@@ -86,6 +87,23 @@ public class UserService {
             var entity = repository.save(UserMapper.registrationDtoToUserEntity(registrationDto));
             return UserMapper.entityToUserDto(entity);
         }
+
+    }
+
+    /**
+     * Метод для изменения профиля пользователя
+     *
+     * @param updateProfileDto DTO с данными для Изменения профиля
+     * @return объект типа {@link UserDto}
+     * @throws ConflictException возникает при уже существующих email или login
+     */
+    @Transactional
+    public UserDto updateProfile(UpdateProfileDto updateProfileDto, String login) {
+        var entity = repository.findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Такого пользователя не существует"));
+        entity = UserMapper.updateUserFields(entity, updateProfileDto);
+        repository.save(entity);
+        return UserMapper.entityToUserDto(entity);
 
     }
 

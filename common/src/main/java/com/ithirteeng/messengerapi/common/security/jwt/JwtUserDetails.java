@@ -2,16 +2,18 @@ package com.ithirteeng.messengerapi.common.security.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class JwtUserDetails {
 
-    private final UUID id;
+    private UUID id;
 
-    private final String login;
+    private String login;
 
-    private final String fullName;
+    private String fullName;
 }
