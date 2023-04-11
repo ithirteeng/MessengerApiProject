@@ -49,4 +49,17 @@ public class UserEntity {
 
     @Column(name = "avatar_id")
     private UUID avatarId;
+
+    private UserEntity(String fullName, String login, String email, String city, Date birthDate, String telephoneNumber) {
+        this.fullName = fullName;
+        this.login = login;
+        this.email = email;
+        this.city = city;
+        this.birthDate = birthDate;
+        this.telephoneNumber = telephoneNumber;
+    }
+
+    public static UserEntity from(String fullName, String login, String email, String city, Date birthDate, String telephoneNumber) {
+        return new UserEntity(fullName, login, email, city, birthDate, telephoneNumber);
+    }
 }

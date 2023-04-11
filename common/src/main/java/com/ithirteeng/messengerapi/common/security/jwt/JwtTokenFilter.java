@@ -36,18 +36,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         var bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
         if (bearerToken == null) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             logError(request, new UnauthorizedException("Отсутсвует хэдер Authorization!"));
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else if (!bearerToken.contains(BEARER_PREFIX)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             logError(request, new UnauthorizedException("Отсутсвует хэдер Authorization!"));
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             var jwtToken = "";
             try {
                 jwtToken = bearerToken.substring(7);
             } catch (Exception e) {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 logError(request, e);
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }
             try {
                 var userData = parseToken(jwtToken);

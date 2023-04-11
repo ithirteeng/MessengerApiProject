@@ -3,6 +3,7 @@ package com.ithirteeng.messengerapi.user.controller;
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.user.dto.*;
+import com.ithirteeng.messengerapi.user.mapper.PageMapper;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.service.AuthenticationService;
 import com.ithirteeng.messengerapi.user.service.UserService;
@@ -64,5 +65,10 @@ public class UserController {
 
         return userService.updateProfile(updateProfileDto, userData.getLogin());
 
+    }
+
+    @PostMapping("/list")
+    public OutputPageDto getUsersList(@Validated @RequestBody SortingDto sortingDto) {
+        return PageMapper.pageToOutputPageDto(userService.getUsersList(sortingDto));
     }
 }

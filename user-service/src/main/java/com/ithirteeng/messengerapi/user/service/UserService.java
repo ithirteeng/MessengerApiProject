@@ -3,15 +3,16 @@ package com.ithirteeng.messengerapi.user.service;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
-import com.ithirteeng.messengerapi.user.dto.LoginDto;
-import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
-import com.ithirteeng.messengerapi.user.dto.UpdateProfileDto;
-import com.ithirteeng.messengerapi.user.dto.UserDto;
+import com.ithirteeng.messengerapi.user.dto.*;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.repository.UserRepository;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository repository;
+
+    private final CheckPaginationDetailsService paginationDetailsService;
 
     /**
      * Метод для получения данных о пользователе по id
@@ -104,7 +107,32 @@ public class UserService {
         entity = UserMapper.updateUserFields(entity, updateProfileDto);
         repository.save(entity);
         return UserMapper.entityToUserDto(entity);
+    }
 
+    @Transactional
+    public Page<UserDto> getUsersList(SortingDto sortingDto) {
+        var pageInfo = sortingDto.getPageInfo();
+        paginationDetailsService.checkPagination(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+
+        var filtersInfo = sortingDto.getFilters();
+        UserEntity exampleUser = UserEntity.from(
+                filtersInfo.getFullName(),
+                filtersInfo.getLogin(),
+                filtersInfo.getEmail(),
+                filtersInfo.getCity(),
+                filtersInfo.getBirthDate(),
+                filtersInfo.getTelephoneNumber()
+        );
+
+        Example<UserEntity> example = Example.of(exampleUser);
+
+        Page<UserEntity> users = repository.findAll(example, pageable);
+
+        if (users.getTotalPages() <= pageInfo.getPageNumber()) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных");
+        }
+        return users.map(UserMapper::entityToUserDto);
     }
 
 
