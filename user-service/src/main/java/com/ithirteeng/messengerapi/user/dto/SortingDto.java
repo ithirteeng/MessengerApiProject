@@ -15,11 +15,12 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 public class SortingDto {
-    @NotNull
+    @NotNull(message = "Информация о пагинации обязательна!")
     private InputPageDto pageInfo;
 
-    @NotNull
+    @NotNull(message = "Фильтры обязательны!")
     private SortingFiltersDto filters;
 
+    @NotNull(message = "Поля сортировки обязательны!")
     private SortingFieldsDto fields;
 }

@@ -11,13 +11,13 @@ import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.repository.UserRepository;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -123,8 +123,6 @@ public class UserService {
     public Page<UserDto> getUsersList(SortingDto sortingDto) {
         var pageInfo = sortingDto.getPageInfo();
         paginationDetailsService.checkPagination(pageInfo.getPageNumber(), pageInfo.getPageSize());
-        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
-
         var filtersInfo = sortingDto.getFilters();
         UserEntity exampleUser = UserEntity.from(
                 filtersInfo.getFullName(),
@@ -134,15 +132,49 @@ public class UserService {
                 filtersInfo.getBirthDate(),
                 filtersInfo.getTelephoneNumber()
         );
-
+        Sort sort = Sort.by(setupSortData(sortingDto.getFields()));
         Example<UserEntity> example = Example.of(exampleUser);
 
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize(), sort);
         Page<UserEntity> users = repository.findAll(example, pageable);
 
-        if (users.getTotalPages() <= pageInfo.getPageNumber()) {
+        if (users.getTotalPages() <= pageInfo.getPageNumber() && users.getTotalPages() != 0) {
             throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
         }
         return users.map(UserMapper::entityToUserDto);
+    }
+
+    /**
+     * Метод для получения списков объектов типа {@link Sort.Order}, чтобы отсортировать наш список по нужным полям
+     *
+     * @param sortingFieldsDto - ДТО полей, которые нужно отсортировать
+     * @return {@link List<Sort.Order>}
+     */
+    private List<Sort.Order> setupSortData(SortingFieldsDto sortingFieldsDto) {
+        List<Sort.Order> list = new ArrayList<>();
+        list.add(getOrder(sortingFieldsDto.getLogin(), "login"));
+        list.add(getOrder(sortingFieldsDto.getEmail(), "email"));
+        list.add(getOrder(sortingFieldsDto.getFullName(), "fullName"));
+        list.add(getOrder(sortingFieldsDto.getBirthDate(), "birthDate"));
+        list.add(getOrder(sortingFieldsDto.getTelephoneNumber(), "telephoneNumber"));
+        list.add(getOrder(sortingFieldsDto.getCity(), "city"));
+        list.removeIf(Objects::isNull);
+        return list;
+    }
+
+    /**
+     * Методя для получения корректного объекта типа {@link Sort.Order} или null по критериям ниже
+     *
+     * @param direction объект типа {@link org.springframework.data.domain.Sort.Direction}
+     * @param field     название поля таблицы, по которому сортировка ({@link String})
+     * @return null или {@link Sort.Order}
+     */
+    private Sort.Order getOrder(Sort.Direction direction, String field) {
+        if (direction == null) {
+            return null;
+        } else {
+            return new Sort.Order(direction, field);
+        }
     }
 
 

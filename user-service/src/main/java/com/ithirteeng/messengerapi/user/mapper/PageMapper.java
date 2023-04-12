@@ -20,6 +20,7 @@ public class PageMapper {
         return OutputPageDto.builder()
                 .users(page.getContent())
                 .pageNumber(page.getPageable().getPageNumber())
+                .sortInfo(page.getPageable().getSort())
                 .pageSize(page.getPageable().getPageSize())
                 .totalPages(page.getTotalPages())
                 .build();

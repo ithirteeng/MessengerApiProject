@@ -1,6 +1,7 @@
 package com.ithirteeng.messengerapi.user.dto;
 
 import lombok.*;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class OutputPageDto {
 
     private List<UserDto> users;
+
+    private Sort sortInfo;
 
     private int totalPages;
 

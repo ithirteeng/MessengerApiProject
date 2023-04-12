@@ -24,7 +24,7 @@ public class UserEntity {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @Column(name = "registration_date")
+    @Column(name = "registrationDate")
     private Date registrationDate;
 
     @Column(unique = true)
@@ -35,19 +35,19 @@ public class UserEntity {
 
     private String password;
 
-    @Column(name = "full_name")
+    @Column(name = "fullName")
     private String fullName;
 
-    @Column(name = "birth_date")
+    @Column(name = "birthDate")
     @Temporal(TemporalType.DATE)
     private Date birthDate;
 
-    @Column(name = "telephone_number")
+    @Column(name = "telephoneNumber")
     private String telephoneNumber;
 
     private String city;
 
-    @Column(name = "avatar_id")
+    @Column(name = "avatarId")
     private UUID avatarId;
 
     /**
