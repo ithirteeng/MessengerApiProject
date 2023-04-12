@@ -3,28 +3,34 @@ package com.ithirteeng.messengerapi.user.service;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
-import com.ithirteeng.messengerapi.user.dto.LoginDto;
-import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
-import com.ithirteeng.messengerapi.user.dto.UpdateProfileDto;
-import com.ithirteeng.messengerapi.user.dto.UserDto;
+import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
+import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
+import com.ithirteeng.messengerapi.user.dto.*;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.repository.UserRepository;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Сервис для работы с данными о юзере
  */
 @Service
+@EnablePaginationService
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository repository;
+
+    private final CheckPaginationDetailsService paginationDetailsService;
 
     /**
      * Метод для получения данных о пользователе по id
@@ -34,7 +40,7 @@ public class UserService {
      * @throws NotFoundException возникает при несуществующем id пользователя
      */
     @Transactional(readOnly = true)
-    public UserEntity getUserEntityById(UUID id) {
+    public UserEntity findUserEntityById(UUID id) {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователся с таким id " + id + " не существует"));
@@ -95,7 +101,7 @@ public class UserService {
      *
      * @param updateProfileDto DTO с данными для Изменения профиля
      * @return объект типа {@link UserDto}
-     * @throws ConflictException возникает при уже существующих email или login
+     * @throws NotFoundException возникает при несуществующем пользователе
      */
     @Transactional
     public UserDto updateProfile(UpdateProfileDto updateProfileDto, String login) {
@@ -104,7 +110,71 @@ public class UserService {
         entity = UserMapper.updateUserFields(entity, updateProfileDto);
         repository.save(entity);
         return UserMapper.entityToUserDto(entity);
+    }
 
+    /**
+     * Метод для получения данных по объекту класса {@link SortingDto} для пагинации
+     *
+     * @param sortingDto объект класса {@link SortingDto}
+     * @return {@link Page<UserDto>}
+     * @throws BadRequestException при номере страницы не должен превышать общее число онных - 1
+     */
+    @Transactional
+    public Page<UserDto> getUsersList(SortingDto sortingDto) {
+        var pageInfo = sortingDto.getPageInfo();
+        paginationDetailsService.checkPagination(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        var filtersInfo = sortingDto.getFilters();
+        UserEntity exampleUser = UserEntity.from(
+                filtersInfo.getFullName(),
+                filtersInfo.getLogin(),
+                filtersInfo.getEmail(),
+                filtersInfo.getCity(),
+                filtersInfo.getBirthDate(),
+                filtersInfo.getTelephoneNumber()
+        );
+        Sort sort = Sort.by(setupSortData(sortingDto.getFields()));
+        Example<UserEntity> example = Example.of(exampleUser);
+
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize(), sort);
+        Page<UserEntity> users = repository.findAll(example, pageable);
+
+        if (users.getTotalPages() <= pageInfo.getPageNumber() && users.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        }
+        return users.map(UserMapper::entityToUserDto);
+    }
+
+    /**
+     * Метод для получения списков объектов типа {@link Sort.Order}, чтобы отсортировать наш список по нужным полям
+     *
+     * @param sortingFieldsDto - ДТО полей, которые нужно отсортировать
+     * @return {@link List<Sort.Order>}
+     */
+    private List<Sort.Order> setupSortData(SortingFieldsDto sortingFieldsDto) {
+        List<Sort.Order> list = new ArrayList<>();
+        list.add(getOrder(sortingFieldsDto.getLogin(), "login"));
+        list.add(getOrder(sortingFieldsDto.getEmail(), "email"));
+        list.add(getOrder(sortingFieldsDto.getFullName(), "fullName"));
+        list.add(getOrder(sortingFieldsDto.getBirthDate(), "birthDate"));
+        list.add(getOrder(sortingFieldsDto.getTelephoneNumber(), "telephoneNumber"));
+        list.add(getOrder(sortingFieldsDto.getCity(), "city"));
+        list.removeIf(Objects::isNull);
+        return list;
+    }
+
+    /**
+     * Методя для получения корректного объекта типа {@link Sort.Order} или null по критериям ниже
+     *
+     * @param direction объект типа {@link org.springframework.data.domain.Sort.Direction}
+     * @param field     название поля таблицы, по которому сортировка ({@link String})
+     * @return null или {@link Sort.Order}
+     */
+    private Sort.Order getOrder(Sort.Direction direction, String field) {
+        if (direction == null) {
+            return null;
+        } else {
+            return new Sort.Order(direction, field);
+        }
     }
 
 

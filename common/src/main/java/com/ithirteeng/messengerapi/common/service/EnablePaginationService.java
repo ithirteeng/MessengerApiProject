@@ -1,4 +1,4 @@
-package com.ithirteeng.messengerapi.common.security;
+package com.ithirteeng.messengerapi.common.service;
 
 import org.springframework.context.annotation.Import;
 
@@ -8,10 +8,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Аннотация для подключения пакета security
+ * Аннотация для подключения сервиса для пагинации
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(SecurityConfig.class)
-public @interface EnableSpringSecurity {
+@Import(CheckPaginationDetailsService.class)
+public @interface EnablePaginationService {
 }

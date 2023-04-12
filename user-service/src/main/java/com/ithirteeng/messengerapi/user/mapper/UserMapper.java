@@ -57,6 +57,13 @@ public class UserMapper {
                 .build();
     }
 
+    /**
+     * Метод для преобразования объектов класса {@link UpdateProfileDto} в объекты {@link UserEntity}
+     *
+     * @param userEntity класс с данными из БД
+     * @param updateProfileDto ДТО для обноления данных
+     * @return объект типа {@link UserEntity}
+     */
     public static UserEntity updateUserFields(UserEntity userEntity, UpdateProfileDto updateProfileDto) {
         return UserEntity.builder()
                 .id(userEntity.getId())
@@ -72,6 +79,13 @@ public class UserMapper {
                 .build();
     }
 
+    /**
+     * Метод для преобразования старых полей класса в новые
+     *
+     * @param updateString новая строка
+     * @param oldString старая строка
+     * @return если новая == null - старую, иначе - новую
+     */
     private static String updateNullProperties(String updateString, String oldString) {
         if (updateString != null) {
             return updateString;

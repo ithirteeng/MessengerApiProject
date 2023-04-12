@@ -21,6 +21,9 @@ import java.util.UUID;
 
 import static java.lang.System.currentTimeMillis;
 
+/**
+ * Сервис для запросов с аутентификацией
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -31,6 +34,14 @@ public class AuthenticationService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * Метод для генерации JWT токена для логина
+     *
+     * @param loginDto ДТО для запросов с логином
+     * @return {@link String}
+     * @throws BadRequestException при неверном пароле
+     * @throws NotFoundException при несуществующем пользователе
+     */
     public String generateJwt(LoginDto loginDto) {
         var userEntity = userRepository.findByLogin(loginDto.getLogin())
                 .orElseThrow(() -> new NotFoundException("Такого пользователя не существует"));
@@ -40,13 +51,25 @@ public class AuthenticationService {
         return generateJwtTokenForUser(userEntity);
     }
 
+    /**
+     * Метод для генерации JWT токена для логина
+     *
+     * @param registrationDto ДТО для запросов с регистрацией
+     * @return {@link String}
+     * @throws NotFoundException при несуществующем пользователе
+     */
     public String generateJwt(RegistrationDto registrationDto) {
         var userEntity = userRepository.findByLogin(registrationDto.getLogin())
                 .orElseThrow(() -> new NotFoundException("Такого пользователя не существует"));
         return generateJwtTokenForUser(userEntity);
     }
 
-
+    /**
+     * Метод генерации JWT токена по данным пользователя ({@link UserEntity})
+     *
+     * @param userEntity объект класса {@link UserEntity}
+     * @return {@link String}
+     */
     private String generateJwtTokenForUser(UserEntity userEntity) {
         var key = Keys.hmacShaKeyFor(securityProps.getJwtToken().getSecret().getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()

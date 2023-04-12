@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
+/**
+ * Класс для парсинга реквизитов из application.yml
+ */
 @Getter
 @Setter
 @ToString

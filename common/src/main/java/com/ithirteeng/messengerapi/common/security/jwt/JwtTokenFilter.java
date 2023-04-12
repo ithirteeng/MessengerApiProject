@@ -18,9 +18,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static com.ithirteeng.messengerapi.common.security.consts.RequestsConstants.AUTHORIZATION_HEADER;
-import static com.ithirteeng.messengerapi.common.security.consts.RequestsConstants.BEARER_PREFIX;
+import static com.ithirteeng.messengerapi.common.consts.RequestsConstants.AUTHORIZATION_HEADER;
+import static com.ithirteeng.messengerapi.common.consts.RequestsConstants.BEARER_PREFIX;
 
+/**
+ * Фильтр аутентификации по JWT
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
@@ -36,18 +39,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         var bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
         if (bearerToken == null) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             logError(request, new UnauthorizedException("Отсутсвует хэдер Authorization!"));
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else if (!bearerToken.contains(BEARER_PREFIX)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             logError(request, new UnauthorizedException("Отсутсвует хэдер Authorization!"));
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             var jwtToken = "";
             try {
                 jwtToken = bearerToken.substring(7);
             } catch (Exception e) {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 logError(request, e);
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }
             try {
                 var userData = parseToken(jwtToken);
@@ -63,6 +66,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Метод для получение данных {@link JwtUserDetails} из jwt токена
+     *
+     * @param jwtToken наш jwt токен в формате {@link String}
+     * @return {@link JwtUserDetails}
+     * @throws UnauthorizedException
+     */
     private JwtUserDetails parseToken(String jwtToken) throws UnauthorizedException {
         JwtUserDetails userData;
         try {
@@ -85,6 +95,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         return userData;
     }
 
+    /**
+     * Метод для логирования ошибок, исходящий из фильтра
+     *
+     * @param request   запрос, в ходе выполнения которого возникло исключение
+     * @param exception исключение
+     */
     private void logError(HttpServletRequest request, Exception exception) {
         log.error("Произошла ошибка на запросе {}", request.getRequestURL());
         log.error(exception.getMessage(), exception);
