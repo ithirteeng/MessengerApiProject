@@ -1,6 +1,11 @@
 server:
   port: 1301
 spring:
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:5432/users_service_db
+    user: ithirteeng
+    password: ithirteeng
   datasource:
     url: jdbc:postgresql://localhost:5432/users_service_db
     username: ithirteeng
@@ -8,7 +13,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 
 app:
   jwt-token:

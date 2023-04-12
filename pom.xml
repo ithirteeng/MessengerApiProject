@@ -27,6 +27,7 @@
         <snakeyaml.version>2.0</snakeyaml.version>
         <spring-security.crypto.version>5.4.11</spring-security.crypto.version>
         <jwt.version>0.11.5</jwt.version>
+        <flyway.version>8.0.5</flyway.version>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +121,12 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>1.70</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
             </dependency>
 
         </dependencies>
