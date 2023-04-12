@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/api/friends")
 @RequiredArgsConstructor
 public class FriendsController {
 
@@ -34,5 +34,10 @@ public class FriendsController {
     @DeleteMapping("/delete")
     public void deleteFriend(@Validated @RequestBody DeleteFriendDto deleteFriendDto) {
         friendsService.deleteFriend(deleteFriendDto);
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "HELLO!";
     }
 }

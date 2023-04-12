@@ -1,0 +1,14 @@
+server:
+  port: 1309
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: users-service
+          uri: http://localhost:1301/
+          predicates:
+            - Path=/api/users/**
+        - id: friends-service
+          uri: http://localhost:1308/
+          predicates:
+            - Path=/api/friends/*

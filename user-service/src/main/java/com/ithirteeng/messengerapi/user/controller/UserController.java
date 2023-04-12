@@ -68,4 +68,9 @@ public class UserController {
     public OutputPageDto getUsersList(@Validated @RequestBody SortingDto sortingDto) {
         return PageMapper.pageToOutputPageDto(userService.getUsersList(sortingDto));
     }
+
+    @GetMapping("/test")
+    public String test() {
+        return "HELLO!";
+    }
 }
