@@ -1,8 +1,10 @@
 package com.ithirteeng.messengerapi.friends.controller;
 
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
+import com.ithirteeng.messengerapi.friends.dto.common.SortingDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.AddDeleteFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
+import com.ithirteeng.messengerapi.friends.dto.friendlist.OutputFriendsPageDto;
 import com.ithirteeng.messengerapi.friends.service.FriendsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -34,6 +36,12 @@ public class FriendsController {
     public void deleteFriend(@Validated @RequestBody AddDeleteFriendDto addDeleteFriendDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         friendsService.deleteFriend(addDeleteFriendDto.getExternalUserId(), userData.getId());
+    }
+
+    @GetMapping("/list")
+    public OutputFriendsPageDto test(@Validated @RequestBody SortingDto sortingDto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return friendsService.getFriendsList(sortingDto, userData.getId());
     }
 
 }

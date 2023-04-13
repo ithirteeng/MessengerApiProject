@@ -6,18 +6,30 @@ import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
+import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
+import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
+import com.ithirteeng.messengerapi.friends.dto.common.SortingDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
+import com.ithirteeng.messengerapi.friends.dto.friendlist.OutputFriendsPageDto;
+import com.ithirteeng.messengerapi.friends.entity.FriendEntity;
 import com.ithirteeng.messengerapi.friends.mapper.FriendsMapper;
+import com.ithirteeng.messengerapi.friends.mapper.PageMapper;
 import com.ithirteeng.messengerapi.friends.repository.FriendsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+@EnablePaginationService
 @Service
 @RequiredArgsConstructor
 public class FriendsService {
@@ -25,6 +37,8 @@ public class FriendsService {
     private final FriendsRepository friendsRepository;
 
     private final SecurityProps securityProps;
+
+    private final CheckPaginationDetailsService paginationDetailsService;
 
     private HttpEntity<Void> setupRequestHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
@@ -120,6 +134,37 @@ public class FriendsService {
             friendsRepository.save(entity);
             friendsRepository.save(entity2);
         }
+    }
+
+    @Transactional
+    public OutputFriendsPageDto getFriendsList(SortingDto sortingDto, UUID targetUserId) {
+        var pageInfo = sortingDto.getPageInfo();
+        paginationDetailsService.checkPagination(pageInfo.getPageNumber(), pageInfo.getPageSize());
+
+        var filtersInfo = sortingDto.getFilters();
+        var exampleFriend = FriendEntity.from(
+                filtersInfo.getAddingDate(),
+                filtersInfo.getDeletingDate(),
+                filtersInfo.getExternalId(),
+                targetUserId
+        );
+        Example<FriendEntity> example = Example.of(exampleFriend);
+
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+
+        Page<FriendEntity> friends = friendsRepository.findAll(example, pageable);
+        List<FriendEntity> fullNameList;
+        if (filtersInfo.getFullName() != null) {
+            fullNameList = friendsRepository.findByFullNameLike(filtersInfo.getFullName());
+        } else {
+            fullNameList = friendsRepository.findByFullNameLike("");
+        }
+
+        if (friends.getTotalPages() <= pageInfo.getPageNumber() && friends.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        }
+
+        return PageMapper.pageToOutputPageDto(friends, fullNameList);
     }
 
 

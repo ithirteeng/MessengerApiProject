@@ -21,9 +21,11 @@ public class FriendEntity {
     private UUID id;
 
     @Column(name = "add_friend_date")
+    @Temporal(TemporalType.DATE)
     private Date addFriendDate;
 
     @Column(name = "delete_friend_date")
+    @Temporal(TemporalType.DATE)
     private Date deleteFriendDate;
 
     @Column(name = "target_user")
@@ -34,4 +36,15 @@ public class FriendEntity {
 
     @Column(name = "full_name")
     private String fullName;
+
+    private FriendEntity(Date addFriendDate, Date deleteFriendDate, UUID addingUserId, UUID targetUserId) {
+        this.addFriendDate = addFriendDate;
+        this.deleteFriendDate = deleteFriendDate;
+        this.addingUserId = addingUserId;
+        this.targetUserId = targetUserId;
+    }
+
+    public static FriendEntity from(Date addFriendDate, Date deleteFriendDate, UUID addingUserId, UUID targetUserId) {
+        return new FriendEntity(addFriendDate, deleteFriendDate, addingUserId, targetUserId);
+    }
 }
