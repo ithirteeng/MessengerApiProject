@@ -1,14 +1,19 @@
 server:
   port: 1308
 spring:
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:5432/friends_service_db
+    user: ithirteeng
+    password: ithirteeng
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/friends_service_db
     username: ithirteeng
     password: ithirteeng
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 
 app:
   jwt-token:
