@@ -38,7 +38,7 @@ public class FriendsController {
         friendsService.deleteFriend(addDeleteFriendDto.getExternalUserId(), userData.getId());
     }
 
-    @GetMapping("/list")
+    @PostMapping("/list")
     public OutputFriendsPageDto test(@Validated @RequestBody SortingDto sortingDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return friendsService.getFriendsList(sortingDto, userData.getId());
