@@ -9,10 +9,10 @@ import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
 import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
 import com.ithirteeng.messengerapi.friends.dto.common.PageFiltersDto;
+import com.ithirteeng.messengerapi.friends.dto.common.SearchDto;
 import com.ithirteeng.messengerapi.friends.dto.common.SortingDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.OutputFriendsPageDto;
-import com.ithirteeng.messengerapi.friends.dto.friendlist.ShortFriendDto;
 import com.ithirteeng.messengerapi.friends.entity.FriendEntity;
 import com.ithirteeng.messengerapi.friends.mapper.FriendsMapper;
 import com.ithirteeng.messengerapi.friends.mapper.PageMapper;
@@ -159,9 +159,9 @@ public class FriendsService {
         Page<FriendEntity> friends = friendsRepository.findAll(example, pageable);
         List<FriendEntity> fullNameList;
         if (filtersInfo.getFullName() != null) {
-            fullNameList = friendsRepository.findByFullNameLike(filtersInfo.getFullName());
+            fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(filtersInfo.getFullName(), targetUserId);
         } else {
-            fullNameList = friendsRepository.findByFullNameLike("");
+            fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId("", targetUserId);
         }
 
         if (friends.getTotalPages() <= pageInfo.getPageNumber() && friends.getTotalPages() != 0) {
@@ -172,19 +172,14 @@ public class FriendsService {
     }
 
     @Transactional(readOnly = true)
-    public List<ShortFriendDto> getFriendsList(PageFiltersDto pageFiltersDto, UUID targetUserId) {
-        var example = setupFriendEntityExample(pageFiltersDto, targetUserId);
+    public OutputFriendsPageDto searchFriends(SearchDto searchDto, UUID targetUserId) {
+        var pageInfo = searchDto.getPageInfo();
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
 
-        List<FriendEntity> mainList = friendsRepository.findAll(example);
-        List<FriendEntity> fullNameList;
-        if (pageFiltersDto.getFullName() != null) {
-            fullNameList = friendsRepository.findByFullNameLike(pageFiltersDto.getFullName());
-        } else {
-            fullNameList = friendsRepository.findByFullNameLike("");
-        }
+        Page<FriendEntity> friendsPage = friendsRepository.findAllByTargetUserId(targetUserId, pageable);
+        List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(searchDto.getFilterName(), targetUserId);
 
-        var resultList = PageMapper.intersection(mainList, fullNameList);
-        return PageMapper.mapEntityListToDtoList(resultList);
+        return PageMapper.pageToOutputPageDto(friendsPage, fullNameList);
     }
 
     private Example<FriendEntity> setupFriendEntityExample(PageFiltersDto filtersInfo, UUID targetUserId) {

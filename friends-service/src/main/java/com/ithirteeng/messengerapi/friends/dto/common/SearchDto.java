@@ -11,10 +11,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class SortingDto {
+public class SearchDto {
     @NotNull(message = "Информация о пагинации обязательна!")
     private InputPageDto pageInfo;
 
-    @NotNull(message = "Фильтры обязательны!")
-    private PageFiltersDto filters;
+    @NotNull(message = "Фильтр обязателен!")
+    private String filterName;
 }
