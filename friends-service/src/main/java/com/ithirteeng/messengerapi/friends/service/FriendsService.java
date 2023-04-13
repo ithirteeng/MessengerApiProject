@@ -9,8 +9,10 @@ import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.mapper.FriendsMapper;
 import com.ithirteeng.messengerapi.friends.repository.FriendsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.UUID;
@@ -20,6 +22,14 @@ import java.util.UUID;
 public class FriendsService {
 
     private final FriendsRepository friendsRepository;
+
+    private RestTemplate restTemplate;
+
+    public Boolean checkUserExisting(UUID userId) {
+        ResponseEntity<Boolean> responseEntity = restTemplate
+                .getForEntity("http://localhost:1301/api/integrations/3c286211-d507-47ff-87f0-8e9072307a23", Boolean.class);
+        return responseEntity.getBody();
+    }
 
     @Transactional(readOnly = true)
     public FullFriendDto getFriendData(UUID targetId, UUID friendId) {

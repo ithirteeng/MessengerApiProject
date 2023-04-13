@@ -15,11 +15,10 @@ app:
     permit-all:
       - /api/users/registration
       - /api/users/login
-      - /api/friends/test
     root-path: /api
     secret: qwerqwerqwerqwetruiqywterqiuwyertqiwueyrtqwiueyrtqwuieyrtqwiueyrtqwuerqqqwyeurtqiwuyertqiuwyetrqiuwyetrqiuwyetrqwuiyertqwuyiertqwuiyertqwuiyertqwuieytrquwyetruqiwyetruiqwyretiuqywetuqwyetuqwyretqiuwyretqiwueyrtqiuwerytqiwueyrtqiuweyrtqwuieyrtqwueiyrtqweuir
     expiration: 600000
   integrations:
     root-path: /integration
-    api-key: ac546098c1c44ac2b2ae132f89c82e7e345d25a1h46474e75a78f9a5ce496060cЯ
+    api-key: ac546098c1c44ac2b2ae132f89c82e7e345d25a1h46474e75a78f9a5ce496060c
 

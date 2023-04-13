@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.common.security;
 
+import com.ithirteeng.messengerapi.common.security.integration.IntegrationFilter;
 import com.ithirteeng.messengerapi.common.security.jwt.JwtTokenFilter;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,19 @@ public class CommonSecurityConfig {
                                 securityProps.getJwtToken().getRootPath(),
                                 securityProps.getJwtToken().getPermitAll()
                         )
+                );
+        return finalize(http);
+    }
+
+    /**
+     * Настройка конфига для интеграционных запросов
+     */
+    @Bean
+    public SecurityFilterChain setupIntegrationFilterChain(HttpSecurity http) {
+        http = http
+                .addFilterBefore(
+                        new IntegrationFilter(securityProps.getIntegrations().getApiKey()),
+                        UsernamePasswordAuthenticationFilter.class
                 );
         return finalize(http);
     }

@@ -1,11 +1,13 @@
 package com.ithirteeng.messengerapi.friends.controller;
 
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
+import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.AddFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.DeleteFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.service.FriendsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,5 +41,11 @@ public class FriendsController {
     @GetMapping("/test")
     public String test() {
         return "HELLO!";
+    }
+
+    @GetMapping("/userex")
+    public UUID ifUserExists(Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return (userData.getId());
     }
 }
