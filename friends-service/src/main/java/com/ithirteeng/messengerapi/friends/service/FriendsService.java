@@ -155,29 +155,14 @@ public class FriendsService {
         Example<FriendEntity> example = setupFriendEntityExample(filtersInfo, targetUserId);
 
         Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        Page<FriendEntity> friendsPage = friendsRepository.findAll(example, pageable);
 
-        Page<FriendEntity> friends = friendsRepository.findAll(example, pageable);
-        List<FriendEntity> fullNameList;
-        if (filtersInfo.getFullName() != null) {
-            fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(filtersInfo.getFullName(), targetUserId);
-        } else {
-            fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId("", targetUserId);
-        }
+        var nameFilter = filtersInfo.getFullName() == null ? "" : filtersInfo.getFullName();
+        List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(nameFilter, targetUserId);
 
-        if (friends.getTotalPages() <= pageInfo.getPageNumber() && friends.getTotalPages() != 0) {
+        if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() && friendsPage.getTotalPages() != 0) {
             throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
         }
-
-        return PageMapper.pageToOutputPageDto(friends, fullNameList);
-    }
-
-    @Transactional(readOnly = true)
-    public OutputFriendsPageDto searchFriends(SearchDto searchDto, UUID targetUserId) {
-        var pageInfo = searchDto.getPageInfo();
-        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
-
-        Page<FriendEntity> friendsPage = friendsRepository.findAllByTargetUserId(targetUserId, pageable);
-        List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(searchDto.getFilterName(), targetUserId);
 
         return PageMapper.pageToOutputPageDto(friendsPage, fullNameList);
     }
@@ -190,6 +175,21 @@ public class FriendsService {
                 targetUserId
         );
         return Example.of(exampleFriend);
+    }
+
+    @Transactional(readOnly = true)
+    public OutputFriendsPageDto searchFriends(SearchDto searchDto, UUID targetUserId) {
+        var pageInfo = searchDto.getPageInfo();
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+
+        Page<FriendEntity> friendsPage = friendsRepository.findAllByTargetUserId(targetUserId, pageable);
+        List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(searchDto.getFilterName(), targetUserId);
+
+        if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() && friendsPage.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        }
+
+        return PageMapper.pageToOutputPageDto(friendsPage, fullNameList);
     }
 
 
