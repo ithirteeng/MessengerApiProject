@@ -30,7 +30,7 @@ public class PageMapper {
                 .build();
     }
 
-    private static List<ShortFriendDto> mapEntityListToDtoList(List<FriendEntity> list) {
+    public static List<ShortFriendDto> mapEntityListToDtoList(List<FriendEntity> list) {
         var newList = new ArrayList<ShortFriendDto>();
         for (FriendEntity entity : list) {
             newList.add(FriendsMapper.shortDtoFromEntity(entity));
@@ -38,7 +38,7 @@ public class PageMapper {
         return newList;
     }
 
-    private static <T> List<T> intersection(List<T> list1, List<T> list2) {
+    public static <T> List<T> intersection(List<T> list1, List<T> list2) {
         List<T> list = new ArrayList<>();
 
         for (T t : list1) {

@@ -8,9 +8,11 @@ import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
 import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
+import com.ithirteeng.messengerapi.friends.dto.common.PageFiltersDto;
 import com.ithirteeng.messengerapi.friends.dto.common.SortingDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.OutputFriendsPageDto;
+import com.ithirteeng.messengerapi.friends.dto.friendlist.ShortFriendDto;
 import com.ithirteeng.messengerapi.friends.entity.FriendEntity;
 import com.ithirteeng.messengerapi.friends.mapper.FriendsMapper;
 import com.ithirteeng.messengerapi.friends.mapper.PageMapper;
@@ -144,19 +146,13 @@ public class FriendsService {
         }
     }
 
-    @Transactional
-    public OutputFriendsPageDto getFriendsList(SortingDto sortingDto, UUID targetUserId) {
+    @Transactional(readOnly = true)
+    public OutputFriendsPageDto getFriendsPage(SortingDto sortingDto, UUID targetUserId) {
         var pageInfo = sortingDto.getPageInfo();
         paginationDetailsService.checkPagination(pageInfo.getPageNumber(), pageInfo.getPageSize());
 
         var filtersInfo = sortingDto.getFilters();
-        var exampleFriend = FriendEntity.from(
-                filtersInfo.getAddingDate(),
-                filtersInfo.getDeletingDate(),
-                filtersInfo.getExternalId(),
-                targetUserId
-        );
-        Example<FriendEntity> example = Example.of(exampleFriend);
+        Example<FriendEntity> example = setupFriendEntityExample(filtersInfo, targetUserId);
 
         Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
 
@@ -173,6 +169,32 @@ public class FriendsService {
         }
 
         return PageMapper.pageToOutputPageDto(friends, fullNameList);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ShortFriendDto> getFriendsList(PageFiltersDto pageFiltersDto, UUID targetUserId) {
+        var example = setupFriendEntityExample(pageFiltersDto, targetUserId);
+
+        List<FriendEntity> mainList = friendsRepository.findAll(example);
+        List<FriendEntity> fullNameList;
+        if (pageFiltersDto.getFullName() != null) {
+            fullNameList = friendsRepository.findByFullNameLike(pageFiltersDto.getFullName());
+        } else {
+            fullNameList = friendsRepository.findByFullNameLike("");
+        }
+
+        var resultList = PageMapper.intersection(mainList, fullNameList);
+        return PageMapper.mapEntityListToDtoList(resultList);
+    }
+
+    private Example<FriendEntity> setupFriendEntityExample(PageFiltersDto filtersInfo, UUID targetUserId) {
+        var exampleFriend = FriendEntity.from(
+                filtersInfo.getAddingDate(),
+                filtersInfo.getDeletingDate(),
+                filtersInfo.getExternalId(),
+                targetUserId
+        );
+        return Example.of(exampleFriend);
     }
 
 

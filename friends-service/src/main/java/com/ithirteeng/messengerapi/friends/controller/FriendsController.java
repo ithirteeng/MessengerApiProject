@@ -1,16 +1,19 @@
 package com.ithirteeng.messengerapi.friends.controller;
 
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
+import com.ithirteeng.messengerapi.friends.dto.common.PageFiltersDto;
 import com.ithirteeng.messengerapi.friends.dto.common.SortingDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.AddDeleteFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.OutputFriendsPageDto;
+import com.ithirteeng.messengerapi.friends.dto.friendlist.ShortFriendDto;
 import com.ithirteeng.messengerapi.friends.service.FriendsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,10 +41,16 @@ public class FriendsController {
         friendsService.deleteFriend(addDeleteFriendDto.getExternalUserId(), userData.getId());
     }
 
-    @PostMapping("/list")
-    public OutputFriendsPageDto test(@Validated @RequestBody SortingDto sortingDto, Authentication authentication) {
+    @PostMapping("/page")
+    public OutputFriendsPageDto getPage(@Validated @RequestBody SortingDto sortingDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
-        return friendsService.getFriendsList(sortingDto, userData.getId());
+        return friendsService.getFriendsPage(sortingDto, userData.getId());
+    }
+
+    @PostMapping("/list")
+    public List<ShortFriendDto> getList(@Validated @RequestBody PageFiltersDto pageFiltersDto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return friendsService.getFriendsList(pageFiltersDto, userData.getId());
     }
 
 }
