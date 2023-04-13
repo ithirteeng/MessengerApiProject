@@ -1,15 +1,16 @@
 package com.ithirteeng.messengerapi.friends.service;
 
+import com.ithirteeng.messengerapi.common.consts.RequestsConstants;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
-import com.ithirteeng.messengerapi.friends.dto.friendlist.AddFriendDto;
-import com.ithirteeng.messengerapi.friends.dto.friendlist.DeleteFriendDto;
+import com.ithirteeng.messengerapi.common.model.UserDto;
+import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.mapper.FriendsMapper;
 import com.ithirteeng.messengerapi.friends.repository.FriendsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -23,18 +24,46 @@ public class FriendsService {
 
     private final FriendsRepository friendsRepository;
 
-    private RestTemplate restTemplate;
+    private final SecurityProps securityProps;
 
-    public Boolean checkUserExisting(UUID userId) {
-        ResponseEntity<Boolean> responseEntity = restTemplate
-                .getForEntity("http://localhost:1301/api/integrations/3c286211-d507-47ff-87f0-8e9072307a23", Boolean.class);
+    private HttpEntity<Void> setupRequestHttpEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(RequestsConstants.API_KEY_HEADER, securityProps.getIntegrations().getApiKey());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(headers);
+    }
+
+    private void checkUserExisting(UUID userId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1301/integration/users/check/" + userId.toString();
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), Boolean.class
+        );
+
+        if (Boolean.FALSE.equals(responseEntity.getBody())) {
+            throw new NotFoundException("Пользователя с id: " + userId + " не существует!");
+        }
+    }
+
+    private UserDto getUserById(UUID userId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1301/integration/users/data/" + userId.toString();
+
+        ResponseEntity<UserDto> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), UserDto.class
+        );
+
         return responseEntity.getBody();
     }
 
     @Transactional(readOnly = true)
     public FullFriendDto getFriendData(UUID targetId, UUID friendId) {
+        checkUserExisting(targetId);
+        checkUserExisting(friendId);
+
         var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetId, friendId)
-                .orElseThrow(() -> new NotFoundException("Друга с таким id " + friendId + " не существует"));
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + friendId + " не является другом"));
 
         if (entity.getDeleteFriendDate() != null) {
             throw new BadRequestException("Пользователь с таким id " + friendId + " удален из списка друзей");
@@ -44,36 +73,52 @@ public class FriendsService {
     }
 
     @Transactional
-    public void addFriend(AddFriendDto addFriendDto) {
-        var entity = friendsRepository.findByTargetUserIdAndAddingUserId(addFriendDto.getTargetUserId(), addFriendDto.getAddingUserId())
-                .orElse(null);
+    public void addFriend(UUID friendId, UUID targetUserId) {
+        checkUserExisting(targetUserId);
+
+        var externalUser = getUserById(friendId);
+        var targetUser = getUserById(targetUserId);
+
+        addFriendToTargetUser(friendId, targetUser);
+        addFriendToTargetUser(targetUserId, externalUser);
+    }
+
+    private void addFriendToTargetUser(UUID targetUserId, UserDto externalUserDto) {
+        var entity = friendsRepository.findByTargetUserIdAndAddingUserId(
+                targetUserId,
+                externalUserDto.getId()
+        ).orElse(null);
+
         if (entity != null && entity.getDeleteFriendDate() != null) {
             entity.setDeleteFriendDate(null);
             entity.setAddFriendDate(new Date());
-            entity.setFullName(addFriendDto.getFullName());
+            entity.setFullName(externalUserDto.getFullName());
             friendsRepository.save(entity);
         } else if (entity == null) {
-            friendsRepository.save(FriendsMapper.createEntityFromNewFriendDto(addFriendDto));
+            friendsRepository.save(FriendsMapper.createEntityFromNewFriendDto(externalUserDto, targetUserId));
         } else {
-            throw new ConflictException("Такой друг уже существует!");
+            throw new ConflictException("Пользователь уже являлется вашим другом!");
         }
     }
 
     @Transactional
-    public void deleteFriend(DeleteFriendDto deleteFriendDto) {
-        friendsRepository.getAllByTargetUserId(deleteFriendDto.getTargetUserId())
-                .orElseThrow(() -> new NotFoundException("Целевого пользователя с таким id не существует"));
+    public void deleteFriend(UUID friendId, UUID targetUserId) {
+        checkUserExisting(friendId);
 
-        var entity = friendsRepository.findByTargetUserIdAndAddingUserId(
-                deleteFriendDto.getTargetUserId(),
-                deleteFriendDto.getExternalUserId()
-        ).orElseThrow(() -> new NotFoundException("Друга с таким id не существует!"));
+        var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetUserId, friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователя нет в друзьях!"));
+        var entity2 = friendsRepository.findByTargetUserIdAndAddingUserId(friendId, targetUserId)
+                .orElseThrow(() -> new NotFoundException("Пользователя нет в друзьях!"));
 
         if (entity.getDeleteFriendDate() != null) {
-            throw new ConflictException("Пользователь с таким id уже удален из списка друзей");
+            throw new ConflictException("Пользователь с таким id уже удален из списка друзей!");
         } else {
-            entity.setDeleteFriendDate(new Date());
+            var date = new Date();
+            entity.setDeleteFriendDate(date);
+            entity2.setDeleteFriendDate(date);
+
             friendsRepository.save(entity);
+            friendsRepository.save(entity2);
         }
     }
 

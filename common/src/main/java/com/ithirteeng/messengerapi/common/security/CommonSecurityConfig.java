@@ -42,15 +42,15 @@ public class CommonSecurityConfig {
     @Bean
     public SecurityFilterChain setupJwtFilterChain(HttpSecurity http) {
         http = http
-                .addFilterBefore(
-                        new JwtTokenFilter(securityProps.getJwtToken().getSecret()),
-                        UsernamePasswordAuthenticationFilter.class
-                )
                 .requestMatcher(
                         filterPredicate(
                                 securityProps.getJwtToken().getRootPath(),
                                 securityProps.getJwtToken().getPermitAll()
                         )
+                )
+                .addFilterBefore(
+                        new JwtTokenFilter(securityProps.getJwtToken().getSecret()),
+                        UsernamePasswordAuthenticationFilter.class
                 );
         return finalize(http);
     }
@@ -61,6 +61,7 @@ public class CommonSecurityConfig {
     @Bean
     public SecurityFilterChain setupIntegrationFilterChain(HttpSecurity http) {
         http = http
+                .requestMatcher(filterPredicate(securityProps.getIntegrations().getRootPath()))
                 .addFilterBefore(
                         new IntegrationFilter(securityProps.getIntegrations().getApiKey()),
                         UsernamePasswordAuthenticationFilter.class

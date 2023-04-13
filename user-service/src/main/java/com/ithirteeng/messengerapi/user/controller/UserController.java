@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.user.controller;
 
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
 import com.ithirteeng.messengerapi.user.dto.*;
 import com.ithirteeng.messengerapi.user.mapper.PageMapper;

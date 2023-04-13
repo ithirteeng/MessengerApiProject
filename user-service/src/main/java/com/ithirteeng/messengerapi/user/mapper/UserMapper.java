@@ -2,7 +2,7 @@ package com.ithirteeng.messengerapi.user.mapper;
 
 import com.ithirteeng.messengerapi.user.dto.RegistrationDto;
 import com.ithirteeng.messengerapi.user.dto.UpdateProfileDto;
-import com.ithirteeng.messengerapi.user.dto.UserDto;
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.user.entity.UserEntity;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import org.springframework.stereotype.Component;

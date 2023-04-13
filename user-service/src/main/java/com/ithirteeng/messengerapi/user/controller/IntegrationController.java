@@ -1,5 +1,8 @@
 package com.ithirteeng.messengerapi.user.controller;
 
+import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.UserDto;
+import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +19,15 @@ public class IntegrationController {
 
     private final UserRepository userRepository;
 
-    @GetMapping("/{id}")
+    @GetMapping("/users/check/{id}")
     public Boolean checkUserExisingById(@PathVariable("id") UUID userId) {
         return userRepository.existsById(userId);
+    }
+
+    @GetMapping("/users/data/{id}")
+    public UserDto getUserById(@PathVariable("id") UUID userId) {
+        var entity = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователя с id: " + userId + " не существует"));
+        return UserMapper.entityToUserDto(entity);
     }
 }

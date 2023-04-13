@@ -1,7 +1,7 @@
 package com.ithirteeng.messengerapi.user.mapper;
 
 import com.ithirteeng.messengerapi.user.dto.OutputPageDto;
-import com.ithirteeng.messengerapi.user.dto.UserDto;
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
