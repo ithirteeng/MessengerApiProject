@@ -2,12 +2,14 @@ package com.ithirteeng.messengerapi.friends.controller;
 
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
+import com.ithirteeng.messengerapi.common.exception.ErrorResponse;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import com.ithirteeng.messengerapi.common.model.ApiErrorModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -134,5 +136,29 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     private void logError(WebRequest request, Exception exception) {
         log.error("Произошла ошибка на запросе {}", request.getDescription(true));
         log.error(exception.getMessage(), exception);
+    }
+
+    /**
+     * Метод для обработки исключений для невалидных тел запросов.
+     *
+     * @param ex исключение.
+     * @param headers   заголовки, которые будут записаны в ответ.
+     * @param status    выбранный статус ответа.
+     * @param request   текущий запрос.
+     * @return {@link ResponseEntity}, где ключ - название поля невалидного тела запроса,
+     * а значение - список {@code user-friendly} сообщений об ошибке.
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
+        logError(request, ex);
+        List<String> details = new ArrayList<>();
+        details.add("JSON fields are invalid!");
+        ErrorResponse error = new ErrorResponse("JSON parse error", details);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

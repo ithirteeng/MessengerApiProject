@@ -90,6 +90,10 @@ public class FriendsService {
     public void addFriend(UUID friendId, UUID targetUserId) {
         checkUserExisting(targetUserId);
 
+        if (targetUserId == friendId) {
+            throw new BadRequestException("Пользователь не может добавить сам себя в друзья!");
+        }
+
         var externalUser = getUserById(friendId);
         var targetUser = getUserById(targetUserId);
 
@@ -118,6 +122,10 @@ public class FriendsService {
     @Transactional
     public void deleteFriend(UUID friendId, UUID targetUserId) {
         checkUserExisting(friendId);
+
+        if (targetUserId == friendId) {
+            throw new BadRequestException("Пользователь не может удалить сам себя в друзья!");
+        }
 
         var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetUserId, friendId)
                 .orElseThrow(() -> new NotFoundException("Пользователя нет в друзьях!"));
