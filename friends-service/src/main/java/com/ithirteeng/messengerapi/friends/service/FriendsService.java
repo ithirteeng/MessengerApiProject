@@ -183,7 +183,8 @@ public class FriendsService {
         Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
 
         Page<FriendEntity> friendsPage = friendsRepository.findAllByTargetUserId(targetUserId, pageable);
-        List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(searchDto.getFilterName(), targetUserId);
+        var nameFilter = searchDto.getFilterName() == null ? "" : searchDto.getFilterName();
+        List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(nameFilter, targetUserId);
 
         if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() && friendsPage.getTotalPages() != 0) {
             throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");

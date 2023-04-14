@@ -12,7 +12,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/friends")
@@ -40,13 +42,13 @@ public class FriendsController {
     }
 
     @PostMapping("/list")
-    public OutputFriendsPageDto getList(@Validated @RequestBody SortingDto sortingDto, Authentication authentication) {
+    public OutputFriendsPageDto getList(@Valid @RequestBody SortingDto sortingDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return friendsService.getFriendsPage(sortingDto, userData.getId());
     }
 
     @PostMapping("/search")
-    public OutputFriendsPageDto searchFriends(@Validated @RequestBody SearchDto searchDto, Authentication authentication) {
+    public OutputFriendsPageDto searchFriends(@Valid @RequestBody SearchDto searchDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return friendsService.searchFriends(searchDto, userData.getId());
     }

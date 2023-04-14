@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -12,9 +13,12 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 public class SortingDto {
+
     @NotNull(message = "Информация о пагинации обязательна!")
+    @Valid
     private InputPageDto pageInfo;
 
     @NotNull(message = "Фильтры обязательны!")
+    @Valid
     private PageFiltersDto filters;
 }
