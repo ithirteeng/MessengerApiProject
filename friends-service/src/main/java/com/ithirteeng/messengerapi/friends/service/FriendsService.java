@@ -193,5 +193,17 @@ public class FriendsService {
         return PageMapper.pageToOutputPageDto(friendsPage, fullNameList);
     }
 
+    @Transactional
+    public void updateFullNameFields(UUID friendId, UUID targetUserId) {
+        checkUserExisting(friendId);
+        var user = getUserById(friendId);
+
+        if(!friendsRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
+            throw new NotFoundException("Пользователя нет в ваших друзьях!");
+        }
+
+        friendsRepository.updateFullNameByAddingUserId(friendId, user.getFullName());
+    }
+
 
 }

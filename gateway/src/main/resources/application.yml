@@ -11,4 +11,4 @@ spring:
         - id: friends-service
           uri: http://localhost:1308/
           predicates:
-            - Path=/api/friends/*
+            - Path=/api/friends/**

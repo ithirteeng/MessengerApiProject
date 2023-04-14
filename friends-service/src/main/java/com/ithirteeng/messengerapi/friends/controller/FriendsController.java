@@ -53,4 +53,10 @@ public class FriendsController {
         return friendsService.searchFriends(searchDto, userData.getId());
     }
 
+    @PatchMapping(value = "/{id}/update")
+    public void updateFriendsFullName(@PathVariable("id") UUID id, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        friendsService.updateFullNameFields(id, userData.getId());
+    }
+
 }
