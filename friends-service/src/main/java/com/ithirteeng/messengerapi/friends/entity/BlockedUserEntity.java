@@ -21,9 +21,11 @@ public class BlockedUserEntity {
     private UUID id;
 
     @Column(name = "add_note_date")
+    @Temporal(TemporalType.DATE)
     private Date addNoteDate;
 
     @Column(name = "delete_note_date")
+    @Temporal(TemporalType.DATE)
     private Date deleteNoteDate;
 
     @Column(name = "target_user")
