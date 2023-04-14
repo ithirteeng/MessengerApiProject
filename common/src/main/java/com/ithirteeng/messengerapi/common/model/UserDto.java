@@ -1,4 +1,4 @@
-package com.ithirteeng.messengerapi.user.dto;
+package com.ithirteeng.messengerapi.common.model;
 
 import lombok.*;
 

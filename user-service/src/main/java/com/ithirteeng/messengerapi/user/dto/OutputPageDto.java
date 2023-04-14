@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.user.dto;
 
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import lombok.*;
 import org.springframework.data.domain.Sort;
 

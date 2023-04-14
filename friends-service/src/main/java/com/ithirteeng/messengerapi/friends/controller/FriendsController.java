@@ -1,15 +1,20 @@
 package com.ithirteeng.messengerapi.friends.controller;
 
-import com.ithirteeng.messengerapi.common.exception.BadRequestException;
-import com.ithirteeng.messengerapi.friends.dto.friendlist.AddFriendDto;
-import com.ithirteeng.messengerapi.friends.dto.friendlist.DeleteFriendDto;
+import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
+import com.ithirteeng.messengerapi.friends.dto.common.SearchDto;
+import com.ithirteeng.messengerapi.friends.dto.common.SortingDto;
+import com.ithirteeng.messengerapi.friends.dto.friendlist.AddDeleteFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
+import com.ithirteeng.messengerapi.friends.dto.friendlist.OutputFriendsPageDto;
 import com.ithirteeng.messengerapi.friends.service.FriendsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/friends")
@@ -19,25 +24,39 @@ public class FriendsController {
     private final FriendsService friendsService;
 
     @PostMapping("/add")
-    public void addFriend(@Validated @RequestBody AddFriendDto addFriendDto) {
-        if (addFriendDto == null) {
-            throw new BadRequestException("Тело запроса не должно бтыь пустым");
-        }
-        friendsService.addFriend(addFriendDto);
+    public void addFriend(@Validated @RequestBody AddDeleteFriendDto addDeleteFriendDto, Authentication authentication) {
+        var targetUserData = (JwtUserDetails) authentication.getPrincipal();
+        friendsService.addFriend(addDeleteFriendDto.getExternalUserId(), targetUserData.getId());
     }
 
-    @GetMapping("/{id}/data")
-    public FullFriendDto getFriendData(@PathVariable("id") UUID id) {
-        return friendsService.getFriendData(UUID.fromString("2e74baa2-29e6-4794-8cb8-2789e270bec1"), id);
+    @GetMapping("/{id}")
+    public FullFriendDto getFriendData(@PathVariable("id") UUID id, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return friendsService.getFriendData(userData.getId(), id);
     }
 
     @DeleteMapping("/delete")
-    public void deleteFriend(@Validated @RequestBody DeleteFriendDto deleteFriendDto) {
-        friendsService.deleteFriend(deleteFriendDto);
+    public void deleteFriend(@Validated @RequestBody AddDeleteFriendDto addDeleteFriendDto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        friendsService.deleteFriend(addDeleteFriendDto.getExternalUserId(), userData.getId());
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "HELLO!";
+    @PostMapping("/list")
+    public OutputFriendsPageDto getList(@Valid @RequestBody SortingDto sortingDto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return friendsService.getFriendsPage(sortingDto, userData.getId());
     }
+
+    @PostMapping("/search")
+    public OutputFriendsPageDto searchFriends(@Valid @RequestBody SearchDto searchDto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return friendsService.searchFriends(searchDto, userData.getId());
+    }
+
+    @PatchMapping(value = "/{id}/update")
+    public void updateFriendsFullName(@PathVariable("id") UUID id, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        friendsService.updateFullNameFields(id, userData.getId());
+    }
+
 }

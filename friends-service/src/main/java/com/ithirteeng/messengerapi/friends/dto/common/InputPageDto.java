@@ -1,4 +1,4 @@
-package com.ithirteeng.messengerapi.user.dto;
+package com.ithirteeng.messengerapi.friends.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
 public class InputPageDto {
 
     @NotNull(message = "Номер страницы обязателен!")
-    private int pageNumber;
+    private Integer pageNumber;
 
-    @NotNull(message = "Размер странциы обязателен!")
-    private int pageSize;
+    @NotNull(message = "Размер страницы обязателен!")
+    private Integer pageSize;
 }

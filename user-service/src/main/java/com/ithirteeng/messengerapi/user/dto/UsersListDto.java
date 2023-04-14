@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.user.dto;
 
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.user.utils.enums.SortingType;
 import lombok.*;
 

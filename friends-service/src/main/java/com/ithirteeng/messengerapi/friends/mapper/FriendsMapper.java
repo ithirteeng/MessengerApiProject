@@ -1,22 +1,23 @@
 package com.ithirteeng.messengerapi.friends.mapper;
 
-import com.ithirteeng.messengerapi.friends.dto.friendlist.AddFriendDto;
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.FullFriendDto;
 import com.ithirteeng.messengerapi.friends.dto.friendlist.ShortFriendDto;
 import com.ithirteeng.messengerapi.friends.entity.FriendEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class FriendsMapper {
 
-    public static FriendEntity createEntityFromNewFriendDto(AddFriendDto addFriendDto) {
+    public static FriendEntity createEntityFromNewFriendDto(UserDto userDto, UUID targetUserId) {
         return FriendEntity.builder()
                 .addFriendDate(new Date())
-                .addingUserId(addFriendDto.getAddingUserId())
-                .targetUserId(addFriendDto.getTargetUserId())
-                .fullName(addFriendDto.getFullName())
+                .addingUserId(userDto.getId())
+                .targetUserId(targetUserId)
+                .fullName(userDto.getFullName())
                 .build();
     }
 

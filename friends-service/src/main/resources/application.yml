@@ -1,25 +1,29 @@
 server:
   port: 1308
 spring:
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:5432/friends_service_db
+    user: ithirteeng
+    password: ithirteeng
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/friends_service_db
     username: ithirteeng
     password: ithirteeng
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 
 app:
   jwt-token:
     permit-all:
       - /api/users/registration
       - /api/users/login
-      - /api/friends/test
     root-path: /api
     secret: qwerqwerqwerqwetruiqywterqiuwyertqiwueyrtqwiueyrtqwuieyrtqwiueyrtqwuerqqqwyeurtqiwuyertqiuwyetrqiuwyetrqiuwyetrqwuiyertqwuyiertqwuiyertqwuiyertqwuieytrquwyetruqiwyetruiqwyretiuqywetuqwyetuqwyretqiuwyretqiwueyrtqiuwerytqiwueyrtqiuweyrtqwuieyrtqwueiyrtqweuir
-    expiration: 600000
+    expiration: 1800000
   integrations:
     root-path: /integration
-    api-key: ac546098c1c44ac2b2ae132f89c82e7e345d25a1h46474e75a78f9a5ce496060cЯ
+    api-key: ac546098c1c44ac2b2ae132f89c82e7e345d25a1h46474e75a78f9a5ce496060c
 
