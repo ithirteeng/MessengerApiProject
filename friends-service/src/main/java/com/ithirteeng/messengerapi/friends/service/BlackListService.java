@@ -194,4 +194,9 @@ public class BlackListService {
     public Boolean checkIfTargetUserInExternalUsersBlackList(UUID targetUserId, UUID externalUserId) {
         return blackListRepository.existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(externalUserId, targetUserId, null);
     }
+
+    @Transactional
+    public Boolean checkIfUserInBlackList(UUID targetUserId, UUID externalUserId) {
+        return blackListRepository.existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(targetUserId, externalUserId, null);
+    }
 }

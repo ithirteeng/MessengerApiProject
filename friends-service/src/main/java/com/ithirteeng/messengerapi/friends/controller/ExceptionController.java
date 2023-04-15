@@ -135,7 +135,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
      */
     private void logError(WebRequest request, Exception exception) {
         log.error("Произошла ошибка на запросе {}", request.getDescription(true));
-        log.error(exception.getMessage(), exception);
+        log.error(exception.getMessage());
     }
 
     /**
