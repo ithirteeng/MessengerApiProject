@@ -18,15 +18,10 @@ public interface FriendsRepository extends JpaRepository<FriendEntity, UUID> {
 
     Optional<FriendEntity> findByTargetUserIdAndAddingUserId(UUID targetUserId, UUID addingUserId);
 
-    @Query("SELECT f FROM FriendEntity f WHERE f.fullName LIKE %:fullName% AND f.deleteFriendDate = null")
-    List<FriendEntity> findByFullNameLike(@Param("fullName") String fullName);
-
     @Query("SELECT f FROM FriendEntity f WHERE f.fullName LIKE %:fullName% AND f.deleteFriendDate = null AND f.targetUserId = :targetUserId")
     List<FriendEntity> findByFullNameLikeAndTargetUserId(@Param("fullName") String fullName, @Param("targetUserId") UUID targetUserId);
 
     Page<FriendEntity> findAllByTargetUserId(UUID targetUserId, Pageable pageable);
-
-    Optional<List<FriendEntity>> findAllByAddingUserId(UUID addingUserId);
 
     Boolean existsByAddingUserIdAndTargetUserId(UUID addingUserId, UUID targetUserId);
 
