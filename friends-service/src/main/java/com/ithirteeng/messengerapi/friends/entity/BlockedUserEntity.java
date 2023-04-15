@@ -36,4 +36,15 @@ public class BlockedUserEntity {
 
     @Column(name = "full_name")
     private String fullName;
+
+    private BlockedUserEntity(Date addNoteDate, Date deleteNoteDate, UUID addingUserId, UUID targetUserId) {
+        this.addNoteDate = addNoteDate;
+        this.deleteNoteDate = deleteNoteDate;
+        this.addingUserId = addingUserId;
+        this.targetUserId = targetUserId;
+    }
+
+    public static BlockedUserEntity from(Date addNoteDate, Date deleteNoteDate, UUID addingUserId, UUID targetUserId) {
+        return new BlockedUserEntity(addNoteDate, deleteNoteDate, addingUserId, targetUserId);
+    }
 }
