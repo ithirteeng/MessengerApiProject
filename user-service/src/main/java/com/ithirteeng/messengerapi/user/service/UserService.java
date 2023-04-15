@@ -1,9 +1,11 @@
 package com.ithirteeng.messengerapi.user.service;
 
+import com.ithirteeng.messengerapi.common.consts.RequestsConstants;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import com.ithirteeng.messengerapi.common.model.UserDto;
+import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
 import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
 import com.ithirteeng.messengerapi.user.dto.*;
@@ -13,8 +15,10 @@ import com.ithirteeng.messengerapi.user.repository.UserRepository;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,8 @@ public class UserService {
     private final UserRepository repository;
 
     private final CheckPaginationDetailsService paginationDetailsService;
+
+    private final SecurityProps securityProps;
 
     /**
      * Метод для получения данных о пользователе по id
@@ -176,6 +182,34 @@ public class UserService {
         } else {
             return new Sort.Order(direction, field);
         }
+    }
+
+    public UserDto getUserData(String login, UUID targetUserId) {
+        var entity = repository.findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Такого пользоателя не существует"));
+        if (checkIfUserInBlackList(targetUserId, entity.getId())) {
+            throw new BadRequestException("Пользователь добавил вас в черный список");
+        }
+        return UserMapper.entityToUserDto(entity);
+    }
+
+    private Boolean checkIfUserInBlackList(UUID checkUserId, UUID targetUserId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1308/integration/blacklist/" + checkUserId.toString() + "/" + targetUserId.toString();
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), Boolean.class
+        );
+
+        return responseEntity.getBody();
+    }
+
+    private HttpEntity<Void> setupRequestHttpEntity() {
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.set(RequestsConstants.API_KEY_HEADER, securityProps.getIntegrations().getApiKey());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(headers);
     }
 
 

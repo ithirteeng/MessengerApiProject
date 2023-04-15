@@ -2,9 +2,9 @@ create table public.blacklist_table
 (
     id               uuid not null
         primary key,
-    add_note_date    timestamp,
+    add_note_date    date,
     adding_user      uuid,
-    delete_note_date timestamp,
+    delete_note_date date,
     full_name        varchar(255),
     target_user      uuid
 );

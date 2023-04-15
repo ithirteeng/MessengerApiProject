@@ -71,7 +71,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      *
      * @param jwtToken наш jwt токен в формате {@link String}
      * @return {@link JwtUserDetails}
-     * @throws UnauthorizedException
      */
     private JwtUserDetails parseToken(String jwtToken) throws UnauthorizedException {
         JwtUserDetails userData;
@@ -103,6 +102,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      */
     private void logError(HttpServletRequest request, Exception exception) {
         log.error("Произошла ошибка на запросе {}", request.getRequestURL());
-        log.error(exception.getMessage(), exception);
+        log.error(exception.getMessage());
     }
 }

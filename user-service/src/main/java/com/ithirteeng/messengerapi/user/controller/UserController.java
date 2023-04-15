@@ -44,8 +44,9 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto) {
-        return UserMapper.entityToUserDto(userService.getUserByLogin(dto.getLogin()));
+    public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return userService.getUserData(dto.getLogin(), userData.getId());
     }
 
     @GetMapping("/me")
@@ -68,10 +69,5 @@ public class UserController {
     @PostMapping("/list")
     public OutputPageDto getUsersList(@Validated @RequestBody SortingDto sortingDto) {
         return PageMapper.pageToOutputPageDto(userService.getUsersList(sortingDto));
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "HELLO!";
     }
 }

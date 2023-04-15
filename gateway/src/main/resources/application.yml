@@ -12,3 +12,8 @@ spring:
           uri: http://localhost:1308/
           predicates:
             - Path=/api/friends/**
+        - id: blacklist-service
+          uri: http://localhost:1308/
+          predicates:
+            - Path=/api/blacklist/**
+

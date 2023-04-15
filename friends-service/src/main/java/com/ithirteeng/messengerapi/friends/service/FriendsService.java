@@ -1,11 +1,9 @@
 package com.ithirteeng.messengerapi.friends.service;
 
-import com.ithirteeng.messengerapi.common.consts.RequestsConstants;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import com.ithirteeng.messengerapi.common.model.UserDto;
-import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
 import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
 import com.ithirteeng.messengerapi.friends.dto.common.PageFiltersDto;
@@ -22,10 +20,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.List;
@@ -38,45 +34,15 @@ public class FriendsService {
 
     private final FriendsRepository friendsRepository;
 
-    private final SecurityProps securityProps;
+    private final CommonService commonService;
 
     private final CheckPaginationDetailsService paginationDetailsService;
 
-    private HttpEntity<Void> setupRequestHttpEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(RequestsConstants.API_KEY_HEADER, securityProps.getIntegrations().getApiKey());
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<>(headers);
-    }
-
-    private void checkUserExisting(UUID userId) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:1301/integration/users/check/" + userId.toString();
-
-        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(
-                url, HttpMethod.GET, setupRequestHttpEntity(), Boolean.class
-        );
-
-        if (Boolean.FALSE.equals(responseEntity.getBody())) {
-            throw new NotFoundException("Пользователя с id: " + userId + " не существует!");
-        }
-    }
-
-    private UserDto getUserById(UUID userId) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:1301/integration/users/data/" + userId.toString();
-
-        ResponseEntity<UserDto> responseEntity = restTemplate.exchange(
-                url, HttpMethod.GET, setupRequestHttpEntity(), UserDto.class
-        );
-
-        return responseEntity.getBody();
-    }
+    private final BlackListService blackListService;
 
     @Transactional(readOnly = true)
     public FullFriendDto getFriendData(UUID targetId, UUID friendId) {
-        checkUserExisting(targetId);
-        checkUserExisting(friendId);
+        commonService.checkUserExisting(friendId);
 
         var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetId, friendId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id: " + friendId + " не является другом"));
@@ -90,14 +56,20 @@ public class FriendsService {
 
     @Transactional
     public void addFriend(UUID friendId, UUID targetUserId) {
-        checkUserExisting(targetUserId);
+        commonService.checkUserExisting(friendId);
+
+        if (blackListService.checkIfTargetUserInExternalUsersBlackList(targetUserId, friendId)) {
+            throw new BadRequestException("Вы находитесь в черном списке пользователя");
+        } else if (blackListService.checkIfTargetUserInExternalUsersBlackList(friendId, targetUserId)) {
+            throw new BadRequestException("Пользователь находится в вашем черном списке");
+        }
 
         if (targetUserId == friendId) {
             throw new BadRequestException("Пользователь не может добавить сам себя в друзья!");
         }
 
-        var externalUser = getUserById(friendId);
-        var targetUser = getUserById(targetUserId);
+        var externalUser = commonService.getUserById(friendId);
+        var targetUser = commonService.getUserById(targetUserId);
 
         addFriendToTargetUser(friendId, targetUser);
         addFriendToTargetUser(targetUserId, externalUser);
@@ -123,7 +95,7 @@ public class FriendsService {
 
     @Transactional
     public void deleteFriend(UUID friendId, UUID targetUserId) {
-        checkUserExisting(friendId);
+        commonService.checkUserExisting(friendId);
 
         if (targetUserId == friendId) {
             throw new BadRequestException("Пользователь не может удалить сам себя в друзья!");
@@ -195,10 +167,10 @@ public class FriendsService {
 
     @Transactional
     public void updateFullNameFields(UUID friendId, UUID targetUserId) {
-        checkUserExisting(friendId);
-        var user = getUserById(friendId);
+        commonService.checkUserExisting(friendId);
+        var user = commonService.getUserById(friendId);
 
-        if(!friendsRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
+        if (!friendsRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
             throw new NotFoundException("Пользователя нет в ваших друзьях!");
         }
 
