@@ -15,6 +15,7 @@ import com.ithirteeng.messengerapi.friends.entity.BlockedUserEntity;
 import com.ithirteeng.messengerapi.friends.mapper.BlackListMapper;
 import com.ithirteeng.messengerapi.friends.mapper.PageMapper;
 import com.ithirteeng.messengerapi.friends.repository.BlackListRepository;
+import com.ithirteeng.messengerapi.friends.repository.FriendsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -34,9 +35,9 @@ public class BlackListService {
 
     private final BlackListRepository blackListRepository;
 
-    private final CommonService commonService;
+    private final FriendsRepository friendsRepository;
 
-    private final FriendsService friendsService;
+    private final CommonService commonService;
 
     private final CheckPaginationDetailsService paginationDetailsService;
 
@@ -56,9 +57,9 @@ public class BlackListService {
 
     @Transactional
     public void addNote(UUID externalUserId, UUID targetUserId) {
-        commonService.checkUserExisting(targetUserId);
+        commonService.checkUserExisting(externalUserId);
 
-        if (targetUserId == externalUserId) {
+        if (targetUserId.equals(externalUserId)) {
             throw new BadRequestException("Пользователь не может добавить сам себя в черный список!");
         }
 
@@ -66,11 +67,29 @@ public class BlackListService {
 
         addNoteToTargetUser(targetUserId, externalUser);
         try {
-            friendsService.deleteFriend(externalUserId, targetUserId);
+            deleteFriend(externalUserId, targetUserId);
         } catch (Exception e) {
             if (!(e instanceof ConflictException || e instanceof NotFoundException)) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private void deleteFriend(UUID friendId, UUID targetUserId) {
+        var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetUserId, friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователя нет в друзьях!"));
+        var entity2 = friendsRepository.findByTargetUserIdAndAddingUserId(friendId, targetUserId)
+                .orElseThrow(() -> new NotFoundException("Пользователя нет в друзьях!"));
+
+        if (entity.getDeleteFriendDate() != null) {
+            throw new ConflictException("Пользователь с таким id уже удален из списка друзей!");
+        } else {
+            var date = new Date();
+            entity.setDeleteFriendDate(date);
+            entity2.setDeleteFriendDate(date);
+
+            friendsRepository.save(entity);
+            friendsRepository.save(entity2);
         }
     }
 
@@ -96,8 +115,8 @@ public class BlackListService {
     public void deleteNote(UUID externalUserId, UUID targetUserId) {
         commonService.checkUserExisting(externalUserId);
 
-        if (targetUserId == externalUserId) {
-            throw new BadRequestException("Пользователь не может сам себя удалить из черного списка!");
+        if (targetUserId.equals(externalUserId)) {
+            throw new BadRequestException("Пользователь не может добавить сам себя в черный список!");
         }
 
         var entity = blackListRepository.findByTargetUserIdAndAddingUserId(targetUserId, externalUserId)
@@ -160,14 +179,19 @@ public class BlackListService {
     }
 
     @Transactional
-    public void updateFullNameFields(UUID friendId, UUID targetUserId) {
-        commonService.checkUserExisting(friendId);
-        var user = commonService.getUserById(friendId);
+    public void updateFullNameFields(UUID externalUserId, UUID targetUserId) {
+        commonService.checkUserExisting(externalUserId);
+        var user = commonService.getUserById(externalUserId);
 
-        if (!blackListRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
+        if (!blackListRepository.existsByTargetUserIdAndAddingUserId(targetUserId, externalUserId)) {
             throw new NotFoundException("Пользователя нет в черном списке!");
         }
 
-        blackListRepository.updateFullNameByAddingUserId(friendId, user.getFullName());
+        blackListRepository.updateFullNameByAddingUserId(externalUserId, user.getFullName());
+    }
+
+    @Transactional
+    public Boolean checkIfTargetUserInExternalUsersBlackList(UUID targetUserId, UUID externalUserId) {
+        return blackListRepository.existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(externalUserId, targetUserId, null);
     }
 }

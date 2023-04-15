@@ -38,9 +38,10 @@ public class FriendsService {
 
     private final CheckPaginationDetailsService paginationDetailsService;
 
+    private final BlackListService blackListService;
+
     @Transactional(readOnly = true)
     public FullFriendDto getFriendData(UUID targetId, UUID friendId) {
-        commonService.checkUserExisting(targetId);
         commonService.checkUserExisting(friendId);
 
         var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetId, friendId)
@@ -55,7 +56,13 @@ public class FriendsService {
 
     @Transactional
     public void addFriend(UUID friendId, UUID targetUserId) {
-        commonService.checkUserExisting(targetUserId);
+        commonService.checkUserExisting(friendId);
+
+        if (blackListService.checkIfTargetUserInExternalUsersBlackList(targetUserId, friendId)) {
+            throw new BadRequestException("Вы находитесь в черном списке пользователя");
+        } else if (blackListService.checkIfTargetUserInExternalUsersBlackList(friendId, targetUserId)) {
+            throw new BadRequestException("Пользователь находится в вашем черном списке");
+        }
 
         if (targetUserId == friendId) {
             throw new BadRequestException("Пользователь не может добавить сам себя в друзья!");

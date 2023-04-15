@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,9 +23,11 @@ public interface BlackListRepository extends JpaRepository<BlockedUserEntity, UU
 
     Page<BlockedUserEntity> findAllByTargetUserId(UUID targetUserId, Pageable pageable);
 
-    Boolean existsByAddingUserIdAndTargetUserId(UUID addingUserId, UUID targetUserId);
+    Boolean existsByTargetUserIdAndAddingUserId(UUID targetUserId, UUID addingUserId);
 
     @Modifying
     @Query("UPDATE BlockedUserEntity b SET b.fullName = :fullName WHERE b.addingUserId = :addingUserId")
     void updateFullNameByAddingUserId(@Param("addingUserId") UUID addingUserId, @Param("fullName") String fullName);
+
+    Boolean existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(UUID targetUserId, UUID addingUserId, Date deleteNoteDate);
 }
