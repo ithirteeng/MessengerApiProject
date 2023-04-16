@@ -42,6 +42,9 @@ public class CommonSecurityConfig {
     @Bean
     public SecurityFilterChain setupJwtFilterChain(HttpSecurity http) {
         http = http
+//                .exceptionHandling()
+//                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+//                .and()
                 .requestMatcher(
                         filterPredicate(
                                 securityProps.getJwtToken().getRootPath(),
