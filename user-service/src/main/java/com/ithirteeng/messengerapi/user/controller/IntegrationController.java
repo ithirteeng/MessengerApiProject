@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Контроллер для интеграционных запросов
+ */
 @RestController
 @RequestMapping("/integration")
 @RequiredArgsConstructor

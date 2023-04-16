@@ -184,6 +184,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Метод для получения пользователя по логину (с проверкой по черному списку)
+     *
+     * @param login        логин внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     * @return {@link UserDto}
+     */
     public UserDto getUserData(String login, UUID targetUserId) {
         var entity = repository.findByLogin(login)
                 .orElseThrow(() -> new NotFoundException("Такого пользоателя не существует"));
@@ -193,6 +200,13 @@ public class UserService {
         return UserMapper.entityToUserDto(entity);
     }
 
+    /**
+     * Метод проверки нахождения целевого пользовтеля в черном списке внешнего пользователя
+     *
+     * @param checkUserId  Id внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     * @return {@link Boolean}
+     */
     private Boolean checkIfUserInBlackList(UUID checkUserId, UUID targetUserId) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:1308/integration/blacklist/" + checkUserId.toString() + "/" + targetUserId.toString();
@@ -204,6 +218,11 @@ public class UserService {
         return responseEntity.getBody();
     }
 
+    /**
+     * Вспомогательный метод для сборки {@link HttpEntity<Void>}
+     *
+     * @return {@link HttpEntity<Void>}
+     */
     private HttpEntity<Void> setupRequestHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
 

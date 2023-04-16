@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Фильтр аутентификации для интеграционных запросов
+ */
 @RequiredArgsConstructor
 @Slf4j
 public class IntegrationFilter extends OncePerRequestFilter {

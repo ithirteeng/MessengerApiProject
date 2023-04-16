@@ -18,6 +18,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Контроллер для отлавливания ошибок
+ */
 @ControllerAdvice
 @Slf4j
 public class ExceptionController extends ResponseEntityExceptionHandler {
