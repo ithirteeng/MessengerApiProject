@@ -51,7 +51,7 @@ public class BlackListService {
      * @param externalUserId Id внешнего пользователя
      * @return {@link FullNoteDto}
      * @throws ConflictException в том случае, если внешний пользователь уже удален из ЧС
-     * @throws NotFoundException   в том случае, если внешний пользователь не был в ЧС
+     * @throws NotFoundException в том случае, если внешний пользователь не был в ЧС
      */
     @Transactional(readOnly = true)
     public FullNoteDto getNoteData(UUID targetId, UUID externalUserId) {
@@ -97,7 +97,7 @@ public class BlackListService {
     /**
      * Методя для удаления пользователя из списка друзей
      *
-     * @param friendId Id внешнего пользователя
+     * @param friendId     Id внешнего пользователя
      * @param targetUserId Id целевого пользователя
      * @throws ConflictException в случае, если пользователь уже удален из списка друзей
      * @throws NotFoundException в случае, если пользователя нет в друзьях
@@ -123,7 +123,7 @@ public class BlackListService {
     /**
      * Методя для добавления записи в ЧС целевого пользователя
      *
-     * @param targetUserId Id целевого пользователя
+     * @param targetUserId    Id целевого пользователя
      * @param externalUserDto {@link UserDto} внешнего пользователя
      * @throws ConflictException в том случае, если пользователь уже находится в ЧС
      */
@@ -149,10 +149,10 @@ public class BlackListService {
      * Метод для удаления записи из ЧС
      *
      * @param externalUserId Id внешнего пользователя
-     * @param targetUserId Id целевого пользователя
+     * @param targetUserId   Id целевого пользователя
      * @throws BadRequestException в случае, если пользователь попробует сам себя добавить в ЧС
-     * @throws NotFoundException в случае, если пользователя нет в ЧС
-     * @throws ConflictException в случае, если пользователь уже был удален из ЧС
+     * @throws NotFoundException   в случае, если пользователя нет в ЧС
+     * @throws ConflictException   в случае, если пользователь уже был удален из ЧС
      */
     @Transactional
     public void deleteNote(UUID externalUserId, UUID targetUserId) {
@@ -176,7 +176,7 @@ public class BlackListService {
     /**
      * Метод для получение данных из БД с пагинацией
      *
-     * @param sortingDto ДТО с данными для пагинации
+     * @param sortingDto   ДТО с данными для пагинации
      * @param targetUserId Id целевого пользователя
      * @return {@link OutputNotesPageDto}
      * @throws BadRequestException в случае, если номер страницы превыет число онных
@@ -205,7 +205,7 @@ public class BlackListService {
     /**
      * Метод для получения {@link Example}<{@link BlockedUserEntity}>
      *
-     * @param filtersInfo объект {@link PageFiltersDto} с фильтрами
+     * @param filtersInfo  объект {@link PageFiltersDto} с фильтрами
      * @param targetUserId Id целевого пользователя
      * @return {@link Example}<{@link BlockedUserEntity}>
      */
@@ -222,7 +222,7 @@ public class BlackListService {
     /**
      * Метод для получения данных по wildcard фильтру fullName
      *
-     * @param searchDto ДТО для поиска по wildcard фильтру fullName с пагинацией
+     * @param searchDto    ДТО для поиска по wildcard фильтру fullName с пагинацией
      * @param targetUserId Id целевого пользователя
      * @return {@link OutputNotesPageDto}
      * @throws BadRequestException в случае, если номер страницы превыет число онных
@@ -248,7 +248,7 @@ public class BlackListService {
      * Метод для обновления поля fullName для всех записей в БД
      *
      * @param externalUserId Id внешнего пользователя
-     * @param targetUserId Id целевого пользователя
+     * @param targetUserId   Id целевого пользователя
      * @throws NotFoundException в случае, если пользователя нет в ЧС
      */
     @Transactional
@@ -266,7 +266,7 @@ public class BlackListService {
     /**
      * Метод для проверки того, находится ли целевой пользователь в ЧС внешнего пользователя
      *
-     * @param targetUserId Id целевого пользователя
+     * @param targetUserId   Id целевого пользователя
      * @param externalUserId Id внешнего пользователя
      * @return {@link Boolean}
      */
@@ -278,7 +278,7 @@ public class BlackListService {
     /**
      * Метод для проверки того, находится ли внешний пользователь в ЧС целевого пользователя
      *
-     * @param targetUserId Id целевого пользователя
+     * @param targetUserId   Id целевого пользователя
      * @param externalUserId Id внешнего пользователя
      * @return {@link Boolean}
      */
