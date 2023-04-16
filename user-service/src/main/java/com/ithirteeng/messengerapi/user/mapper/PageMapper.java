@@ -1,7 +1,7 @@
 package com.ithirteeng.messengerapi.user.mapper;
 
-import com.ithirteeng.messengerapi.user.dto.OutputPageDto;
 import com.ithirteeng.messengerapi.common.model.UserDto;
+import com.ithirteeng.messengerapi.user.dto.OutputPageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PageMapper {
     /**
-     * Метод для преобразования объектов класса {@link Page} в объект класса {@link OutputPageDto}
+     * Метод для преобразования объектов класса {@link Page}<{@link UserDto}> в объект класса {@link OutputPageDto}
      *
-     * @param page объект класса {@link Page}
+     * @param page объект класса {@link Page}<{@link UserDto}>
      * @return {@link OutputPageDto}
      */
     public static OutputPageDto pageToOutputPageDto(Page<UserDto> page) {

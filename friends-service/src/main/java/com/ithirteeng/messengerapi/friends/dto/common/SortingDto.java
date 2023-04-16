@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+/**
+ * ДТО для поиска по фильтрам с пагинацией
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

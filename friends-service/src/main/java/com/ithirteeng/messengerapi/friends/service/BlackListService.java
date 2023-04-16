@@ -28,6 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис черного списка
+ */
 @EnablePaginationService
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,15 @@ public class BlackListService {
 
     private final CheckPaginationDetailsService paginationDetailsService;
 
+    /**
+     * Метод для получение данных о записи в ЧС
+     *
+     * @param targetId       Id целевого пользователя
+     * @param externalUserId Id внешнего пользователя
+     * @return {@link FullNoteDto}
+     * @throws ConflictException в том случае, если внешний пользователь уже удален из ЧС
+     * @throws NotFoundException   в том случае, если внешний пользователь не был в ЧС
+     */
     @Transactional(readOnly = true)
     public FullNoteDto getNoteData(UUID targetId, UUID externalUserId) {
         commonService.checkUserExisting(externalUserId);
@@ -49,12 +61,20 @@ public class BlackListService {
                 .orElseThrow(() -> new NotFoundException("Пользователь с id: " + externalUserId + " не находится в черном списке"));
 
         if (entity.getDeleteNoteDate() != null) {
-            throw new BadRequestException("Пользователь с id: " + externalUserId + " удален из черного списка");
+            throw new ConflictException("Пользователь с id: " + externalUserId + " удален из черного списка");
         } else {
             return BlackListMapper.fullDtoFromEntity(entity);
         }
     }
 
+    /**
+     * Метод для добавления записи в ЧС
+     *
+     * @param externalUserId Id внешнего пользователя
+     * @param targetUserId   Id целевого пользователя
+     * @throws BadRequestException в случае, если пользователь захочет сам себя добавить в ЧС
+     * @throws RuntimeException    в случае, если при удалении друга вылетит что-то кроме {@link ConflictException} и {@link NotFoundException}
+     */
     @Transactional
     public void addNote(UUID externalUserId, UUID targetUserId) {
         commonService.checkUserExisting(externalUserId);
@@ -62,7 +82,6 @@ public class BlackListService {
         if (targetUserId.equals(externalUserId)) {
             throw new BadRequestException("Пользователь не может добавить сам себя в черный список!");
         }
-
         var externalUser = commonService.getUserById(externalUserId);
 
         addNoteToTargetUser(targetUserId, externalUser);
@@ -75,6 +94,14 @@ public class BlackListService {
         }
     }
 
+    /**
+     * Методя для удаления пользователя из списка друзей
+     *
+     * @param friendId Id внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     * @throws ConflictException в случае, если пользователь уже удален из списка друзей
+     * @throws NotFoundException в случае, если пользователя нет в друзьях
+     */
     private void deleteFriend(UUID friendId, UUID targetUserId) {
         var entity = friendsRepository.findByTargetUserIdAndAddingUserId(targetUserId, friendId)
                 .orElseThrow(() -> new NotFoundException("Пользователя нет в друзьях!"));
@@ -93,6 +120,13 @@ public class BlackListService {
         }
     }
 
+    /**
+     * Методя для добавления записи в ЧС целевого пользователя
+     *
+     * @param targetUserId Id целевого пользователя
+     * @param externalUserDto {@link UserDto} внешнего пользователя
+     * @throws ConflictException в том случае, если пользователь уже находится в ЧС
+     */
     private void addNoteToTargetUser(UUID targetUserId, UserDto externalUserDto) {
         var entity = blackListRepository.findByTargetUserIdAndAddingUserId(
                 targetUserId,
@@ -111,6 +145,15 @@ public class BlackListService {
         }
     }
 
+    /**
+     * Метод для удаления записи из ЧС
+     *
+     * @param externalUserId Id внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     * @throws BadRequestException в случае, если пользователь попробует сам себя добавить в ЧС
+     * @throws NotFoundException в случае, если пользователя нет в ЧС
+     * @throws ConflictException в случае, если пользователь уже был удален из ЧС
+     */
     @Transactional
     public void deleteNote(UUID externalUserId, UUID targetUserId) {
         commonService.checkUserExisting(externalUserId);
@@ -130,6 +173,14 @@ public class BlackListService {
         }
     }
 
+    /**
+     * Метод для получение данных из БД с пагинацией
+     *
+     * @param sortingDto ДТО с данными для пагинации
+     * @param targetUserId Id целевого пользователя
+     * @return {@link OutputNotesPageDto}
+     * @throws BadRequestException в случае, если номер страницы превыет число онных
+     */
     @Transactional(readOnly = true)
     public OutputNotesPageDto getNotes(SortingDto sortingDto, UUID targetUserId) {
         var pageInfo = sortingDto.getPageInfo();
@@ -151,6 +202,13 @@ public class BlackListService {
         return PageMapper.pageToOutputNotesPageDto(blockedUsersPage, fullNameList);
     }
 
+    /**
+     * Метод для получения {@link Example}<{@link BlockedUserEntity}>
+     *
+     * @param filtersInfo объект {@link PageFiltersDto} с фильтрами
+     * @param targetUserId Id целевого пользователя
+     * @return {@link Example}<{@link BlockedUserEntity}>
+     */
     private Example<BlockedUserEntity> setupBlocakedUserEntityExample(PageFiltersDto filtersInfo, UUID targetUserId) {
         var exampleFriend = BlockedUserEntity.from(
                 filtersInfo.getAddingDate(),
@@ -161,6 +219,14 @@ public class BlackListService {
         return Example.of(exampleFriend);
     }
 
+    /**
+     * Метод для получения данных по wildcard фильтру fullName
+     *
+     * @param searchDto ДТО для поиска по wildcard фильтру fullName с пагинацией
+     * @param targetUserId Id целевого пользователя
+     * @return {@link OutputNotesPageDto}
+     * @throws BadRequestException в случае, если номер страницы превыет число онных
+     */
     @Transactional(readOnly = true)
     public OutputNotesPageDto searchNotes(SearchDto searchDto, UUID targetUserId) {
         var pageInfo = searchDto.getPageInfo();
@@ -178,6 +244,13 @@ public class BlackListService {
         return PageMapper.pageToOutputNotesPageDto(blocakedUsersPage, fullNameList);
     }
 
+    /**
+     * Метод для обновления поля fullName для всех записей в БД
+     *
+     * @param externalUserId Id внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     * @throws NotFoundException в случае, если пользователя нет в ЧС
+     */
     @Transactional
     public void updateFullNameFields(UUID externalUserId, UUID targetUserId) {
         commonService.checkUserExisting(externalUserId);
@@ -190,11 +263,25 @@ public class BlackListService {
         blackListRepository.updateFullNameByAddingUserId(externalUserId, user.getFullName());
     }
 
+    /**
+     * Метод для проверки того, находится ли целевой пользователь в ЧС внешнего пользователя
+     *
+     * @param targetUserId Id целевого пользователя
+     * @param externalUserId Id внешнего пользователя
+     * @return {@link Boolean}
+     */
     @Transactional
     public Boolean checkIfTargetUserInExternalUsersBlackList(UUID targetUserId, UUID externalUserId) {
         return blackListRepository.existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(externalUserId, targetUserId, null);
     }
 
+    /**
+     * Метод для проверки того, находится ли внешний пользователь в ЧС целевого пользователя
+     *
+     * @param targetUserId Id целевого пользователя
+     * @param externalUserId Id внешнего пользователя
+     * @return {@link Boolean}
+     */
     @Transactional
     public Boolean checkIfUserInBlackList(UUID targetUserId, UUID externalUserId) {
         return blackListRepository.existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(targetUserId, externalUserId, null);

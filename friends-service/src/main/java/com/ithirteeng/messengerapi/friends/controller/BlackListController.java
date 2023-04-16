@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.UUID;
 
+/**
+ * Контроллер для запросов сервиса черного списка
+ */
 @RestController
 @RequestMapping("/api/blacklist")
 @RequiredArgsConstructor

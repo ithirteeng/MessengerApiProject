@@ -120,10 +120,10 @@ public class UserService {
     }
 
     /**
-     * Метод для получения данных по объекту класса {@link SortingDto} для пагинации
+     * Метод для получения данных по объекту класса {@link SortingDto} c пагинацией
      *
      * @param sortingDto объект класса {@link SortingDto}
-     * @return {@link Page<UserDto>}
+     * @return {@link Page}<{@link UserDto}>
      * @throws BadRequestException при номере страницы не должен превышать общее число онных - 1
      */
     @Transactional
@@ -155,7 +155,7 @@ public class UserService {
      * Метод для получения списков объектов типа {@link Sort.Order}, чтобы отсортировать наш список по нужным полям
      *
      * @param sortingFieldsDto - ДТО полей, которые нужно отсортировать
-     * @return {@link List<Sort.Order>}
+     * @return {@link List}<{@link Sort.Order}>
      */
     private List<Sort.Order> setupSortData(SortingFieldsDto sortingFieldsDto) {
         List<Sort.Order> list = new ArrayList<>();
@@ -219,9 +219,9 @@ public class UserService {
     }
 
     /**
-     * Вспомогательный метод для сборки {@link HttpEntity<Void>}
+     * Вспомогательный метод для сборки {@link HttpEntity}<{@link Void}>
      *
-     * @return {@link HttpEntity<Void>}
+     * @return {@link HttpEntity}<{@link Void}>
      */
     private HttpEntity<Void> setupRequestHttpEntity() {
         HttpHeaders headers = new HttpHeaders();

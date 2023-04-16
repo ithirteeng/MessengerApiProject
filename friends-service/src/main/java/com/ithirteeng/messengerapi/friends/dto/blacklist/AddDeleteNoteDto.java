@@ -5,6 +5,9 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
+/**
+ * ДТО для добавления/удаления пользователя из черного списка
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

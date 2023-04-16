@@ -9,9 +9,19 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Маппер для сущностей друзей
+ */
 @Component
 public class FriendsMapper {
 
+    /**
+     * Метод для преобразования объектов {@link UserDto} в {@link FriendEntity}
+     *
+     * @param userDto      ДТО пользователя
+     * @param targetUserId Id целевого пользователя
+     * @return {@link FriendEntity}
+     */
     public static FriendEntity createEntityFromNewFriendDto(UserDto userDto, UUID targetUserId) {
         return FriendEntity.builder()
                 .addFriendDate(new Date())
@@ -21,6 +31,12 @@ public class FriendsMapper {
                 .build();
     }
 
+    /**
+     * Метод для преобразования объектов {@link FriendEntity} в {@link ShortFriendDto}
+     *
+     * @param friendEntity Объект с данными из БД
+     * @return {@link ShortFriendDto}
+     */
     public static ShortFriendDto shortDtoFromEntity(FriendEntity friendEntity) {
         return ShortFriendDto.builder()
                 .addFriendDate(friendEntity.getAddFriendDate())
@@ -30,6 +46,12 @@ public class FriendsMapper {
                 .build();
     }
 
+    /**
+     * Метод для преобразования объектов {@link FriendEntity} в {@link FullFriendDto}
+     *
+     * @param friendEntity Объект с данными из БД
+     * @return {@link FullFriendDto}
+     */
     public static FullFriendDto fullDtoFromEntity(FriendEntity friendEntity) {
         return FullFriendDto.builder()
                 .addFriendDate(friendEntity.getAddFriendDate())

@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.UUID;
 
-
+/**
+ * Контроллер для запросов сервиса друзей
+ */
 @RestController
 @RequestMapping("/api/friends")
 @RequiredArgsConstructor

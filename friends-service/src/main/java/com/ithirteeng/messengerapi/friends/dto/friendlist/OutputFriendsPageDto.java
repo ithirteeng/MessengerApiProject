@@ -5,6 +5,9 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
+/**
+ * ДТО для вывода списка друзей с информацией о пагинации
+ */
 @Data
 @AllArgsConstructor
 @Getter

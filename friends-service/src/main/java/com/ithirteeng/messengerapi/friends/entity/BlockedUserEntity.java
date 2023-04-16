@@ -2,11 +2,15 @@ package com.ithirteeng.messengerapi.friends.entity;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.domain.Example;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Entity записи в черном списке
+ */
 @Entity
 @Getter
 @Setter
@@ -44,6 +48,9 @@ public class BlockedUserEntity {
         this.targetUserId = targetUserId;
     }
 
+    /**
+     * Метод для получения {@link BlockedUserEntity} в целях получения объекта {@link Example}<{@link BlockedUserEntity}>
+     */
     public static BlockedUserEntity from(Date addNoteDate, Date deleteNoteDate, UUID addingUserId, UUID targetUserId) {
         return new BlockedUserEntity(addNoteDate, deleteNoteDate, addingUserId, targetUserId);
     }

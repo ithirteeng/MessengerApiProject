@@ -6,6 +6,9 @@ import lombok.*;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * ДТО для вывода неполных данных о записи
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Контроллер для отлавливания ошибок
+ */
 @ControllerAdvice
 @Slf4j
 public class ExceptionController extends ResponseEntityExceptionHandler {

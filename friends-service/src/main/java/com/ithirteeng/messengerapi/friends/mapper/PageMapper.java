@@ -18,9 +18,10 @@ import java.util.List;
 @Component
 public class PageMapper {
     /**
-     * Метод для преобразования объектов класса {@link Page} в объект класса {@link OutputFriendsPageDto}
+     * Метод для преобразования объектов {@link Page}<{@link FriendEntity}> и {@link List}<{@link FriendEntity}> в {@link OutputFriendsPageDto}
      *
-     * @param page объект класса {@link Page}
+     * @param page         Объект пагинации с {@link FriendEntity}
+     * @param fullNameList Список пользователей {@link FriendEntity}, с подходящих по wildcard фильтру fullName
      * @return {@link OutputFriendsPageDto}
      */
     public static OutputFriendsPageDto pageToOutputPageDto(Page<FriendEntity> page, List<FriendEntity> fullNameList) {
@@ -33,6 +34,13 @@ public class PageMapper {
                 .build();
     }
 
+    /**
+     * Метод для преобразования объектов {@link Page}<{@link BlockedUserEntity}> и {@link List}<{@link BlockedUserEntity}> в {@link OutputNotesPageDto}
+     *
+     * @param page         Объект пагинации с {@link BlockedUserEntity}
+     * @param fullNameList Список пользователей {@link BlockedUserEntity}, с подходящих по wildcard фильтру fullName
+     * @return {@link OutputNotesPageDto}
+     */
     public static OutputNotesPageDto pageToOutputNotesPageDto(Page<BlockedUserEntity> page, List<BlockedUserEntity> fullNameList) {
         return OutputNotesPageDto.builder()
                 .notes(mapEntityListToNotesDtoList(intersection(page.getContent(), fullNameList)))
@@ -43,6 +51,12 @@ public class PageMapper {
                 .build();
     }
 
+    /**
+     *  Метод для преобразования объектов {@link List}<{@link FriendEntity}> в {@link List}<{@link ShortFriendDto}>
+     *
+     * @param list список сущностей {@link FriendEntity} из БД
+     * @return {@link List}<{@link ShortFriendDto}>
+     */
     public static List<ShortFriendDto> mapEntityListToDtoList(List<FriendEntity> list) {
         var newList = new ArrayList<ShortFriendDto>();
         for (FriendEntity entity : list) {
@@ -51,6 +65,12 @@ public class PageMapper {
         return newList;
     }
 
+    /**
+     *  Метод для преобразования объектов {@link List}<{@link BlockedUserEntity}> в {@link List}<{@link ShortNoteDto}>
+     *
+     * @param list список сущностей {@link BlockedUserEntity} из БД
+     * @return {@link List}<{@link ShortNoteDto}>
+     */
     public static List<ShortNoteDto> mapEntityListToNotesDtoList(List<BlockedUserEntity> list) {
         var newList = new ArrayList<ShortNoteDto>();
         for (BlockedUserEntity entity : list) {
@@ -59,6 +79,14 @@ public class PageMapper {
         return newList;
     }
 
+    /**
+     * Метод для пересечения двух списков
+     *
+     * @param list1 первый список
+     * @param list2 второй список
+     * @return {@link List}
+     * @param <T> любой тип данных
+     */
     public static <T> List<T> intersection(List<T> list1, List<T> list2) {
         List<T> list = new ArrayList<>();
 

@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * ДТО для фильтров в запросах с пагинацией
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
