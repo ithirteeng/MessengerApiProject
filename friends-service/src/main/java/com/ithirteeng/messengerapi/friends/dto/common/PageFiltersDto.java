@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Past;
 import java.util.Date;
 import java.util.UUID;
 
@@ -19,9 +20,11 @@ import java.util.UUID;
 public class PageFiltersDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd", iso = DateTimeFormat.ISO.DATE)
+    @Past(message="Date invalid!")
     private Date addingDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd", iso = DateTimeFormat.ISO.DATE)
+    @Past(message="Date invalid!")
     private Date deletingDate;
 
     private UUID externalId;
