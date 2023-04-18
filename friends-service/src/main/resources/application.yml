@@ -31,4 +31,5 @@ app:
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    org.springframework.web: DEBUG
 
