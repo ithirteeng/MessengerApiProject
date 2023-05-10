@@ -1,0 +1,11 @@
+server:
+  port: 1310
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chat_service_db
+    username: ithirteeng
+    password: ithirteeng
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
