@@ -3,13 +3,13 @@ server:
 spring:
   flyway:
     locations: classpath:migrations
-    url: jdbc:postgresql://localhost:5432/friends_service_db
-    user: ithirteeng
-    password: ithirteeng
+    url: jdbc:postgresql://localhost:1390/friends_db
+    user: friends_user
+    password: friends_password
   datasource:
-    url: jdbc:postgresql://localhost:5432/friends_service_db
-    username: ithirteeng
-    password: ithirteeng
+    url: jdbc:postgresql://localhost:1390/friends_db
+    username: friends_user
+    password: friends_password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
