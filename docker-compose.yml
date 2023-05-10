@@ -2,7 +2,7 @@ version: '3.9'
 services:
   chat_db:
     image: "postgres"
-    restart: always
+    restart: unless-stopped
     container_name: "chat_service"
     ports:
       - "1391:5432"
@@ -15,7 +15,7 @@ services:
 
   friends_db:
     image: "postgres"
-    restart: always
+    restart: unless-stopped
     container_name: "friends_service"
     ports:
       - "1390:5432"
@@ -28,7 +28,7 @@ services:
 
   users_db:
     image: "postgres"
-    restart: always
+    restart: unless-stopped
     container_name: "users_service"
     ports:
       - "1392:5432"
