@@ -9,15 +9,19 @@ create table public.chat_entity
     is_dialog     boolean
 );
 
-
 create table public.chat_user
 (
-    user_id uuid not null
+    id      uuid not null
         primary key,
+    user_id uuid,
     chat_id uuid
         constraint fk_chat1
             references public.chat_entity
 );
+
+alter table public.chat_user
+    owner to chat_user;
+
 
 
 create table public.message_entity
