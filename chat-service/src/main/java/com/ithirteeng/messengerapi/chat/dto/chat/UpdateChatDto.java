@@ -24,6 +24,7 @@ public class UpdateChatDto {
 
     private UUID avatarId;
 
-    @Size(min = 1)
-    private List<UUID> userIdsList;
+    @Size(min = 1, message = "Размер списка не может быть меньше 1")
+    @NotNull(message = "Список не может быть null")
+    private List<UUID> usersIdsList;
 }

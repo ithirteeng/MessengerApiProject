@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class ChatUser {
+public class ChatUserEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -21,7 +21,7 @@ public class ChatUser {
 
     private UUID userId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "chatId", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "chatId")
     private ChatEntity chatEntity;
 }

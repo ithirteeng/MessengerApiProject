@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,5 +35,8 @@ public class ChatEntity {
 
     @Column(name = "avatarId")
     private UUID avatarId;
+
+    @OneToMany(mappedBy = "chatEntity")
+    private List<ChatUserEntity> chatUserEntitiesList;
 
 }

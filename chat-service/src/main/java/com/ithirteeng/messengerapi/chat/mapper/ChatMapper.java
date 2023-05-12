@@ -14,7 +14,6 @@ public class ChatMapper {
                 .chatName(dto.getChatName())
                 .chatAdmin(adminId)
                 .creationDate(new Date())
-                .id(UUID.randomUUID())
                 .isDialog(false)
                 .avatarId(dto.getAvatarId())
                 .build();
@@ -22,7 +21,6 @@ public class ChatMapper {
 
     public static ChatEntity dialogueToChatEntity() {
         return ChatEntity.builder()
-                .id(UUID.randomUUID())
                 .isDialog(true)
                 .build();
     }

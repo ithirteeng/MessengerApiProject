@@ -1,6 +1,7 @@
 package com.ithirteeng.messengerapi.chat.service;
 
 import com.ithirteeng.messengerapi.common.consts.RequestsConstants;
+import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,25 @@ public class CommonService {
 
         if (Boolean.FALSE.equals(responseEntity.getBody())) {
             throw new NotFoundException("Пользователя с id: " + userId + " не существует!");
+        }
+    }
+
+    /**
+     * Метод проверки нахождения целевого пользовтеля в черном списке внешнего пользователя
+     *
+     * @param checkUserId  Id внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     */
+    public void checkIfUserInBlackList(UUID checkUserId, UUID targetUserId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1308/integration/blacklist/" + checkUserId.toString() + "/" + targetUserId.toString();
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), Boolean.class
+        );
+
+        if (Boolean.TRUE.equals(responseEntity.getBody())) {
+            throw new BadRequestException("Пользователю с id: " + checkUserId + " находится в черном списке!");
         }
     }
 }
