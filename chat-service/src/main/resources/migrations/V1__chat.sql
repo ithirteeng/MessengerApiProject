@@ -19,6 +19,7 @@ create table public.chat_user_entity
             references public.chat_entity
 );
 
+
 create table public.message_entity
 (
     id            uuid not null

@@ -1,11 +1,11 @@
 server:
   port: 1310
 spring:
-#  flyway:
-#    locations: classpath:migrations
-#    url: jdbc:postgresql://localhost:1391/chat_db
-#    user: chat_user
-#    password: chat_password
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:1391/chat_db
+    user: chat_user
+    password: chat_password
   datasource:
     url: jdbc:postgresql://localhost:1391/chat_db
     username: chat_user
@@ -13,7 +13,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 
 app:
   jwt-token:
