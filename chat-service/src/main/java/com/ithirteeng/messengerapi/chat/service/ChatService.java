@@ -3,7 +3,6 @@ package com.ithirteeng.messengerapi.chat.service;
 import com.ithirteeng.messengerapi.chat.dto.chat.ChatDto;
 import com.ithirteeng.messengerapi.chat.dto.chat.CreateChatDto;
 import com.ithirteeng.messengerapi.chat.dto.chat.UpdateChatDto;
-import com.ithirteeng.messengerapi.chat.dto.message.SendMessageDto;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 import com.ithirteeng.messengerapi.chat.entity.ChatUserEntity;
 import com.ithirteeng.messengerapi.chat.mapper.ChatMapper;
@@ -27,19 +26,6 @@ public class ChatService {
     private final ChatRepository chatRepository;
 
     private final CommonService commonService;
-
-    @Transactional
-    public void sendMessage(SendMessageDto sendMessageDto, UUID targetUserId) {
-        commonService.checkUserExisting(sendMessageDto.getUserId());
-        commonService.checkIfUserInBlackList(sendMessageDto.getUserId(), targetUserId);
-        commonService.checkIfUserInBlackList(targetUserId, sendMessageDto.getUserId());
-
-        var entity = ChatMapper.dialogueToChatEntity();
-        addChatToUser(entity, sendMessageDto.getUserId());
-        addChatToUser(entity, targetUserId);
-
-        // todo: add ability of sending message
-    }
 
     @Transactional
     public void addChatToUser(ChatEntity chatEntity, UUID userId) {

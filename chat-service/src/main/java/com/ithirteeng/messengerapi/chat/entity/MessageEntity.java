@@ -20,9 +20,6 @@ public class MessageEntity {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "chatId")
-    private ChatEntity chatEntity;
 
     @Column(name = "creationDate")
     @Temporal(TemporalType.DATE)
@@ -32,5 +29,11 @@ public class MessageEntity {
     @Length(max = 500)
     private String messageText;
 
+    @Column(name = "authorId")
+    private UUID authorId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "chatId")
+    private ChatEntity chatEntity;
 }
 
