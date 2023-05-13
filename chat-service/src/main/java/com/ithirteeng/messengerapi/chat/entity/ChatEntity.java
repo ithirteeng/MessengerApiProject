@@ -39,4 +39,7 @@ public class ChatEntity {
     @OneToMany(mappedBy = "chatEntity")
     private List<ChatUserEntity> chatUserEntitiesList;
 
+    @OneToMany(mappedBy = "chatEntity")
+    private List<MessageEntity> messageEntitiesList;
+
 }

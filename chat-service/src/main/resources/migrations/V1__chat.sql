@@ -32,6 +32,7 @@ create table public.message_entity
 );
 
 
+
 create table public.file_entity
 (
     id         uuid not null
