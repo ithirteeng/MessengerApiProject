@@ -1,8 +1,6 @@
 package com.ithirteeng.messengerapi.chat.service;
 
-import com.ithirteeng.messengerapi.chat.dto.message.SendChatMessageDto;
-import com.ithirteeng.messengerapi.chat.dto.message.SendDialogueMessageDto;
-import com.ithirteeng.messengerapi.chat.dto.message.ShowMessageDto;
+import com.ithirteeng.messengerapi.chat.dto.message.*;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 import com.ithirteeng.messengerapi.chat.entity.ChatUserEntity;
 import com.ithirteeng.messengerapi.chat.entity.MessageEntity;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -162,4 +161,51 @@ public class MessageService {
         }
         return result;
     }
+
+    @Transactional
+    public List<OutputMessageDto> getMessagesByText(FindMessageDto findMessageDto, UUID targetUserId) {
+        List<ChatUserEntity> chatsList = chatUserRepository.findAllByUserId(targetUserId);
+        List<MessageEntity> messagesList = messageRepository.findAllByMessageTextLikeByOrderByCreationDateAsc(findMessageDto.getMessage());
+
+        ArrayList<OutputMessageDto> resultList = new ArrayList<>();
+
+        for (MessageEntity entity : messagesList) {
+            if (ifListContainsId(chatsList, entity.getChatEntity().getId())) {
+                String chatName = getChatName(entity, targetUserId);
+                resultList.add(MessageMapper.entityToOutputMessageDto(entity, chatName, "test"));
+            }
+        }
+
+        resultList.sort(Collections.reverseOrder((o1, o2) -> {
+            if (o1.getSendingDate() == null || o2.getSendingDate() == null)
+                return 0;
+            return o1.getSendingDate().compareTo(o2.getSendingDate());
+        }));
+
+        return resultList;
+    }
+
+    private String getChatName(MessageEntity entity, UUID targetUserId) {
+        var chatName = entity.getChatEntity().getChatName();
+        if (entity.getChatEntity().getIsDialog()) {
+            List<ChatUserEntity> idsList = chatUserRepository.findAllByChatEntity(entity.getChatEntity());
+            UUID userId = idsList.get(0).getUserId();
+            if (idsList.get(0).getUserId().equals(targetUserId)) {
+                userId = idsList.get(1).getUserId();
+            }
+            var user = commonService.getUserById(userId);
+            chatName = user.getFullName();
+        }
+        return chatName;
+    }
+
+    private Boolean ifListContainsId(List<ChatUserEntity> list, UUID chatId) {
+        for (ChatUserEntity item : list) {
+            if (item.getChatEntity().getId().equals(chatId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

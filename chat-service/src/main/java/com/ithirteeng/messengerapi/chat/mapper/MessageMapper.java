@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.chat.mapper;
 
+import com.ithirteeng.messengerapi.chat.dto.message.OutputMessageDto;
 import com.ithirteeng.messengerapi.chat.dto.message.SendChatMessageDto;
 import com.ithirteeng.messengerapi.chat.dto.message.SendDialogueMessageDto;
 import com.ithirteeng.messengerapi.chat.dto.message.ShowMessageDto;
@@ -34,6 +35,16 @@ public class MessageMapper {
                 .avatarId(userAvatar)
                 .senderName(userName)
                 .sendingTime(messageEntity.getCreationDate())
+                .message(messageEntity.getMessageText())
+                .build();
+    }
+
+    public static OutputMessageDto entityToOutputMessageDto(MessageEntity messageEntity, String chatName, String fileName) {
+        return OutputMessageDto.builder()
+                .chatId(messageEntity.getChatEntity().getId())
+                .sendingDate(messageEntity.getCreationDate())
+                .fileName(fileName)
+                .chatName(chatName)
                 .message(messageEntity.getMessageText())
                 .build();
     }
