@@ -13,13 +13,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class SendMessageDto {
+public class SendChatMessageDto {
 
-    @NotNull(message = "User id mustn't be not null")
-    private UUID UserId;
+    @NotNull(message = "ID чата обязателен!")
+    private UUID chatId;
 
     @NotEmpty(message = "Сообщение не должно быть пустым")
     private String message;
 
     private List<UUID> filesIdsList;
+
 }

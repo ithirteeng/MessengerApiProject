@@ -24,13 +24,13 @@ create table public.message_entity
 (
     id            uuid not null
         primary key,
+    author_id     uuid,
     creation_date date,
     message_text  varchar(500),
     chat_id       uuid
         constraint fk_chat2
             references public.chat_entity
 );
-
 
 
 create table public.file_entity

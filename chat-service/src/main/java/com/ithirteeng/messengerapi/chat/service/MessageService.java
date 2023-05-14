@@ -1,6 +1,7 @@
 package com.ithirteeng.messengerapi.chat.service;
 
-import com.ithirteeng.messengerapi.chat.dto.message.SendMessageDto;
+import com.ithirteeng.messengerapi.chat.dto.message.SendChatMessageDto;
+import com.ithirteeng.messengerapi.chat.dto.message.SendDialogueMessageDto;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 import com.ithirteeng.messengerapi.chat.entity.ChatUserEntity;
 import com.ithirteeng.messengerapi.chat.mapper.ChatMapper;
@@ -9,6 +10,7 @@ import com.ithirteeng.messengerapi.chat.repository.ChatRepository;
 import com.ithirteeng.messengerapi.chat.repository.ChatUserRepository;
 import com.ithirteeng.messengerapi.chat.repository.MessageRepository;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
+import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,30 +31,30 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     @Transactional
-    public void sendMessage(SendMessageDto sendMessageDto, UUID targetUserId) {
-        if (sendMessageDto.getUserId().equals(targetUserId)) {
+    public void sendMessageInDialogue(SendDialogueMessageDto sendDialogueMessageDto, UUID targetUserId) {
+        if (sendDialogueMessageDto.getUserId().equals(targetUserId)) {
             throw new BadRequestException("Пользователь не может отослать сам себе сообщение!");
         }
-        commonService.checkUserExisting(sendMessageDto.getUserId());
-        commonService.checkIfUserInBlackList(sendMessageDto.getUserId(), targetUserId);
-        commonService.checkIfUserInBlackList(targetUserId, sendMessageDto.getUserId());
-        commonService.checkIfUsersAreFriends(sendMessageDto.getUserId(), targetUserId);
+        commonService.checkUserExisting(sendDialogueMessageDto.getUserId());
+        commonService.checkIfUserInBlackList(sendDialogueMessageDto.getUserId(), targetUserId);
+        commonService.checkIfUserInBlackList(targetUserId, sendDialogueMessageDto.getUserId());
+        commonService.checkIfUsersAreFriends(sendDialogueMessageDto.getUserId(), targetUserId);
 
-        var entity = createDialogue(sendMessageDto, targetUserId);
+        var entity = createDialogue(sendDialogueMessageDto, targetUserId);
 
-        var messageEntity = MessageMapper.sendMessageDtoToEntity(sendMessageDto, entity, targetUserId);
+        var messageEntity = MessageMapper.sendDialogueMessageDtoToEntity(sendDialogueMessageDto, entity, targetUserId);
         messageRepository.save(messageEntity);
     }
 
     @Transactional
-    ChatEntity createDialogue(SendMessageDto sendMessageDto, UUID targetUserId) {
-        var result = checkIfDialogueCreated(sendMessageDto.getUserId(), targetUserId);
+    ChatEntity createDialogue(SendDialogueMessageDto sendDialogueMessageDto, UUID targetUserId) {
+        var result = checkIfDialogueCreated(sendDialogueMessageDto.getUserId(), targetUserId);
         if (result == null) {
             var entity = ChatMapper.dialogueToChatEntity();
 
             chatRepository.save(entity);
 
-            addChatToUser(entity, sendMessageDto.getUserId());
+            addChatToUser(entity, sendDialogueMessageDto.getUserId());
             addChatToUser(entity, targetUserId);
 
             return entity;
@@ -103,5 +105,18 @@ public class MessageService {
             );
         }
 
+    }
+
+    @Transactional
+    public void sendMessageInChat(SendChatMessageDto sendChatMessageDto, UUID targetUserId) {
+        var chatEntity = chatRepository.findById(sendChatMessageDto.getChatId())
+                .orElseThrow(() -> new NotFoundException("Такого чата не существует!"));
+
+        var messageEntity = MessageMapper.sendChatMessageDtoToEntity(sendChatMessageDto, chatEntity, targetUserId);
+        messageRepository.save(messageEntity);
+
+        if (chatEntity.getIsDialog()) {
+            // TODO: send notification
+        }
     }
 }
