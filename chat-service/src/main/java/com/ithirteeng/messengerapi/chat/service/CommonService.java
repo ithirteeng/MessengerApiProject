@@ -65,4 +65,18 @@ public class CommonService {
             throw new BadRequestException("Пользователю с id: " + checkUserId + " находится в черном списке!");
         }
     }
+
+
+    public void checkIfUsersAreFriends(UUID externalUserId, UUID targetUserId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1308/integration/friends/" + externalUserId.toString() + "/" + targetUserId.toString();
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), Boolean.class
+        );
+
+        if (Boolean.FALSE.equals(responseEntity.getBody())) {
+            throw new BadRequestException("Пользователь не является вашим другом!");
+        }
+    }
 }

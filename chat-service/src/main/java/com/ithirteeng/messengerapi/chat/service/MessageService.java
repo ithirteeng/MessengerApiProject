@@ -36,6 +36,7 @@ public class MessageService {
         commonService.checkUserExisting(sendMessageDto.getUserId());
         commonService.checkIfUserInBlackList(sendMessageDto.getUserId(), targetUserId);
         commonService.checkIfUserInBlackList(targetUserId, sendMessageDto.getUserId());
+        commonService.checkIfUsersAreFriends(sendMessageDto.getUserId(), targetUserId);
 
         var entity = createDialogue(sendMessageDto, targetUserId);
 

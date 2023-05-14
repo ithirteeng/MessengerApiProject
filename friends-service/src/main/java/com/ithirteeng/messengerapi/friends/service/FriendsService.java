@@ -242,5 +242,17 @@ public class FriendsService {
         friendsRepository.updateFullNameByAddingUserId(friendId, user.getFullName());
     }
 
+    /**
+     * Метод для проверки, являются ли пользватели друзьями
+     *
+     * @param targetUserId ID целевого юзера
+     * @param externalUserId ID внешнего пользователя
+     * @return {@link Boolean}
+     */
+    @Transactional
+    public Boolean checkIfUsersAreFriends(UUID targetUserId, UUID externalUserId) {
+        return friendsRepository.existsByAddingUserIdAndTargetUserId(externalUserId, targetUserId);
+    }
+
 
 }
