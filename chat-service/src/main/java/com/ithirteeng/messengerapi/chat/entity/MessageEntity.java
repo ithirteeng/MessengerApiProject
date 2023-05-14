@@ -22,7 +22,7 @@ public class MessageEntity {
 
 
     @Column(name = "creationDate")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate;
 
     @Column(name = "messageText")

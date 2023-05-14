@@ -9,13 +9,14 @@ create table public.chat_entity
     is_dialog     boolean
 );
 
+
 create table public.chat_user_entity
 (
     id      uuid not null
         primary key,
     user_id uuid,
     chat_id uuid
-        constraint fk_chat1
+        constraint fk_chat_1
             references public.chat_entity
 );
 
@@ -28,10 +29,10 @@ create table public.message_entity
     creation_date date,
     message_text  varchar(500),
     chat_id       uuid
-        constraint fk_chat2
+        constraint fk_chat_2
             references public.chat_entity
 );
-
+;
 
 create table public.file_entity
 (
