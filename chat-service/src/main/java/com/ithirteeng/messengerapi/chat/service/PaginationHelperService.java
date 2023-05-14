@@ -22,7 +22,7 @@ public class PaginationHelperService {
             var firstIndex = infoDto.getPageNumber() * infoDto.getPageSize();
             var secondIndex = (infoDto.getPageNumber() + 1) * infoDto.getPageSize();
             if (secondIndex >= list.size()) {
-                secondIndex = list.size() - 1;
+                secondIndex = list.size();
             }
             return list.subList(firstIndex, secondIndex);
         }
