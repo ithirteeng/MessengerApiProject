@@ -15,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +28,6 @@ public class ChatService {
     private final CommonService commonService;
 
     private final MessageRepository messageRepository;
-
-    private final PaginationHelperService paginationHelperService;
 
     @Transactional
     public void addChatToUser(ChatEntity chatEntity, UUID userId) {
@@ -119,11 +115,16 @@ public class ChatService {
         List<ChatEntity> fullNameList = chatRepository.findAllByChatNameLike(inputDto.getChatName());
 
         var outputList = intersection(correctChatsList, fullNameList);
+        outputList.sort(Collections.reverseOrder((o1, o2) -> {
+            if (o1.getLastMessageDate() == null || o2.getLastMessageDate() == null)
+                return 0;
+            return o1.getLastMessageDate().compareTo(o2.getLastMessageDate());
+        }));
 
         Integer totalPagesCount = PaginationHelperService.getTotalPagesCount(outputList, paginationInfo);
         outputList = PaginationHelperService.getCorrectPageList(outputList, paginationInfo);
-
-        return ChatMapper.getPageFromData(entitiesListToPageDtoList(outputList), paginationInfo, totalPagesCount);
+        List<PageChatDto> resultList = entitiesListToPageDtoList(outputList);
+        return ChatMapper.getPageFromData(resultList, paginationInfo, totalPagesCount);
     }
 
     private List<ChatEntity> getUsersChats(List<ChatUserEntity> idsList) {
@@ -138,7 +139,6 @@ public class ChatService {
     public List<PageChatDto> entitiesListToPageDtoList(List<ChatEntity> list) {
         ArrayList<PageChatDto> result = new ArrayList<>();
         for (ChatEntity entity : list) {
-            UUID lastMessageAuthorId = entity.getLasMessageAuthorId();
             UUID lastMessageId = entity.getLastMessageId();
             String lastMessageText = null;
             if (lastMessageId != null) {
@@ -177,4 +177,6 @@ public class ChatService {
 
         return list;
     }
+
+
 }
