@@ -3,6 +3,7 @@ package com.ithirteeng.messengerapi.chat.service;
 import com.ithirteeng.messengerapi.common.consts.RequestsConstants;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -66,7 +67,12 @@ public class CommonService {
         }
     }
 
-
+    /**
+     * Метод для проверки, являются ли пользователи друзьями
+     *
+     * @param externalUserId Id внешнего пользователя
+     * @param targetUserId Id целевого пользователя
+     */
     public void checkIfUsersAreFriends(UUID externalUserId, UUID targetUserId) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:1308/integration/friends/" + externalUserId.toString() + "/" + targetUserId.toString();
@@ -78,5 +84,21 @@ public class CommonService {
         if (Boolean.FALSE.equals(responseEntity.getBody())) {
             throw new BadRequestException("Пользователь не является вашим другом!");
         }
+    }
+
+    /**
+     * Метод для получения данных о пользователе по интеграционному запросу в сервис пользователей
+     *
+     * @param userId Id пользователя
+     */
+    public UserDto getUserById(UUID userId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1301/integration/users/data/" + userId.toString();
+
+        ResponseEntity<UserDto> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), UserDto.class
+        );
+
+        return responseEntity.getBody();
     }
 }

@@ -8,10 +8,9 @@ import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -30,5 +29,11 @@ public class ChatController {
     public ChatDto updateChat(@Validated @RequestBody UpdateChatDto updateChatDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return chatService.updateChat(updateChatDto, userData.getId());
+    }
+
+    @GetMapping("/info/{chatId}")
+    public Object getChatInfo(@PathVariable("chatId") UUID chatId, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return chatService.getChatInfoById(chatId, userData.getId());
     }
 }

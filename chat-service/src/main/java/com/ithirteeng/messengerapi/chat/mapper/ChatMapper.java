@@ -1,8 +1,6 @@
 package com.ithirteeng.messengerapi.chat.mapper;
 
-import com.ithirteeng.messengerapi.chat.dto.chat.ChatDto;
-import com.ithirteeng.messengerapi.chat.dto.chat.CreateChatDto;
-import com.ithirteeng.messengerapi.chat.dto.chat.UpdateChatDto;
+import com.ithirteeng.messengerapi.chat.dto.chat.*;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 
 import java.util.Date;
@@ -22,6 +20,7 @@ public class ChatMapper {
     public static ChatEntity dialogueToChatEntity() {
         return ChatEntity.builder()
                 .isDialog(true)
+                .creationDate(new Date())
                 .build();
     }
 
@@ -44,6 +43,22 @@ public class ChatMapper {
                 .id(entity.getId())
                 .isDialog(entity.getIsDialog())
                 .avatarId(entity.getAvatarId())
+                .build();
+    }
+
+    public static ShowChatDto chatEntityToShowChatDto(ChatEntity entity) {
+        return ShowChatDto.builder()
+                .chatName(entity.getChatName())
+                .creationDate(entity.getCreationDate())
+                .chatAdmin(entity.getChatAdmin())
+                .avatarId(entity.getAvatarId())
+                .build();
+    }
+
+    public static ShowDialogueDto chatEntityToShowDialogueDto(ChatEntity entity, String username) {
+        return ShowDialogueDto.builder()
+                .chatName(username)
+                .creationDate(entity.getCreationDate())
                 .build();
     }
 
