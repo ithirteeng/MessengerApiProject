@@ -49,6 +49,12 @@ public class MessageService {
 
         var messageEntity = MessageMapper.sendDialogueMessageDtoToEntity(sendDialogueMessageDto, entity, targetUserId);
         messageRepository.save(messageEntity);
+
+        entity.setLastMessageId(messageEntity.getId());
+        entity.setLastMessageDate(messageEntity.getCreationDate());
+        entity.setLasMessageAuthorId(messageEntity.getAuthorId());
+
+        chatRepository.save(entity);
     }
 
     @Transactional
@@ -122,6 +128,12 @@ public class MessageService {
         } else {
             var messageEntity = MessageMapper.sendChatMessageDtoToEntity(sendChatMessageDto, chatEntity, targetUserId);
             messageRepository.save(messageEntity);
+
+            chatEntity.setLastMessageId(messageEntity.getId());
+            chatEntity.setLastMessageDate(messageEntity.getCreationDate());
+            chatEntity.setLasMessageAuthorId(messageEntity.getAuthorId());
+
+            chatRepository.save(chatEntity);
 
             if (chatEntity.getIsDialog()) {
                 // TODO: send notification

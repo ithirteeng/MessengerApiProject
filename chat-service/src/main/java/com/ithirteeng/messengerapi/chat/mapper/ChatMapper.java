@@ -1,9 +1,11 @@
 package com.ithirteeng.messengerapi.chat.mapper;
 
 import com.ithirteeng.messengerapi.chat.dto.chat.*;
+import com.ithirteeng.messengerapi.chat.dto.common.PageInfoDto;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class ChatMapper {
@@ -61,6 +63,16 @@ public class ChatMapper {
                 .creationDate(entity.getCreationDate())
                 .build();
     }
+
+    public static OutputPageChatDto getPageFromData(List<PageChatDto> list, PageInfoDto pageInfoDto, Integer totalPages) {
+        return OutputPageChatDto.builder()
+                .chats(list)
+                .totalPages(totalPages)
+                .pageNumber(pageInfoDto.getPageNumber())
+                .pageSize(pageInfoDto.getPageSize())
+                .build();
+    }
+
 
 
 }

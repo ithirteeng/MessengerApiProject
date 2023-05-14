@@ -1,19 +1,21 @@
 package com.ithirteeng.messengerapi.chat.service;
 
-import com.ithirteeng.messengerapi.chat.dto.chat.ChatDto;
-import com.ithirteeng.messengerapi.chat.dto.chat.CreateChatDto;
-import com.ithirteeng.messengerapi.chat.dto.chat.UpdateChatDto;
+import com.ithirteeng.messengerapi.chat.dto.chat.*;
+import com.ithirteeng.messengerapi.chat.dto.common.PageInfoDto;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 import com.ithirteeng.messengerapi.chat.entity.ChatUserEntity;
+import com.ithirteeng.messengerapi.chat.entity.MessageEntity;
 import com.ithirteeng.messengerapi.chat.mapper.ChatMapper;
 import com.ithirteeng.messengerapi.chat.repository.ChatRepository;
 import com.ithirteeng.messengerapi.chat.repository.ChatUserRepository;
+import com.ithirteeng.messengerapi.chat.repository.MessageRepository;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +28,10 @@ public class ChatService {
     private final ChatRepository chatRepository;
 
     private final CommonService commonService;
+
+    private final MessageRepository messageRepository;
+
+    private final PaginationHelperService paginationHelperService;
 
     @Transactional
     public void addChatToUser(ChatEntity chatEntity, UUID userId) {
@@ -100,5 +106,75 @@ public class ChatService {
                 return ChatMapper.chatEntityToShowChatDto(entity);
             }
         }
+    }
+
+    @Transactional
+    public OutputPageChatDto getPage(InputChatPageDto inputDto, UUID targetUserId) {
+        var paginationInfo = inputDto.getPageInfo();
+        if (paginationInfo == null) {
+            paginationInfo = new PageInfoDto(0, 50);
+        }
+
+        var correctChatsList = getUsersChats(chatUserRepository.findAllByUserId(targetUserId));
+        List<ChatEntity> fullNameList = chatRepository.findAllByChatNameLike(inputDto.getChatName());
+
+        var outputList = intersection(correctChatsList, fullNameList);
+
+        Integer totalPagesCount = PaginationHelperService.getTotalPagesCount(outputList, paginationInfo);
+        outputList = PaginationHelperService.getCorrectPageList(outputList, paginationInfo);
+
+        return ChatMapper.getPageFromData(entitiesListToPageDtoList(outputList), paginationInfo, totalPagesCount);
+    }
+
+    private List<ChatEntity> getUsersChats(List<ChatUserEntity> idsList) {
+        var result = new ArrayList<ChatEntity>();
+
+        for (ChatUserEntity id : idsList) {
+            result.add(id.getChatEntity());
+        }
+        return result;
+    }
+
+    public List<PageChatDto> entitiesListToPageDtoList(List<ChatEntity> list) {
+        ArrayList<PageChatDto> result = new ArrayList<>();
+        for (ChatEntity entity : list) {
+            UUID lastMessageAuthorId = entity.getLasMessageAuthorId();
+            UUID lastMessageId = entity.getLastMessageId();
+            String lastMessageText = null;
+            if (lastMessageId != null) {
+                MessageEntity message = messageRepository.findById(entity.getLastMessageId())
+                        .orElseThrow(() -> new NotFoundException("Такого сообщения не существует!"));
+                lastMessageText = message.getMessageText();
+            }
+            result.add(PageChatDto.builder()
+                    .chatName(entity.getChatName())
+                    .chatId(entity.getId())
+                    .lastMessageAuthorId(entity.getLasMessageAuthorId())
+                    .lastMessageDate(entity.getLastMessageDate())
+                    .lastMessageText(lastMessageText)
+                    .build()
+            );
+        }
+        return result;
+    }
+
+    /**
+     * Метод для пересечения двух списков
+     *
+     * @param list1 первый список
+     * @param list2 второй список
+     * @param <T>   любой тип данных
+     * @return {@link List}
+     */
+    public static <T> List<T> intersection(List<T> list1, List<T> list2) {
+        List<T> list = new ArrayList<>();
+
+        for (T t : list1) {
+            if (list2.contains(t)) {
+                list.add(t);
+            }
+        }
+
+        return list;
     }
 }

@@ -1,8 +1,6 @@
 package com.ithirteeng.messengerapi.chat.controller;
 
-import com.ithirteeng.messengerapi.chat.dto.chat.ChatDto;
-import com.ithirteeng.messengerapi.chat.dto.chat.CreateChatDto;
-import com.ithirteeng.messengerapi.chat.dto.chat.UpdateChatDto;
+import com.ithirteeng.messengerapi.chat.dto.chat.*;
 import com.ithirteeng.messengerapi.chat.dto.message.ShowMessageDto;
 import com.ithirteeng.messengerapi.chat.service.ChatService;
 import com.ithirteeng.messengerapi.chat.service.MessageService;
@@ -46,5 +44,11 @@ public class ChatController {
     public List<ShowMessageDto> getChatMessages(@PathVariable("chatId") UUID chatId, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return messageService.getMessagesList(chatId, userData.getId());
+    }
+
+    @PostMapping("/list")
+    public OutputPageChatDto getChatMessages(@RequestBody InputChatPageDto inputChatPageDto, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return chatService.getPage(inputChatPageDto, userData.getId());
     }
 }

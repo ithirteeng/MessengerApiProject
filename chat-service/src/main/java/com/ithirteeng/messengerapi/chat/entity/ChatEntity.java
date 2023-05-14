@@ -36,6 +36,16 @@ public class ChatEntity {
     @Column(name = "avatarId")
     private UUID avatarId;
 
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastMessageDate;
+
+    @Column
+    private UUID lastMessageId;
+
+    @Column
+    private UUID lasMessageAuthorId;
+
     @OneToMany(mappedBy = "chatEntity")
     private List<ChatUserEntity> chatUserEntitiesList;
 
