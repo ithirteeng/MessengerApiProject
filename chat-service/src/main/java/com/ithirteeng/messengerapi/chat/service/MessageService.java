@@ -2,8 +2,10 @@ package com.ithirteeng.messengerapi.chat.service;
 
 import com.ithirteeng.messengerapi.chat.dto.message.SendChatMessageDto;
 import com.ithirteeng.messengerapi.chat.dto.message.SendDialogueMessageDto;
+import com.ithirteeng.messengerapi.chat.dto.message.ShowMessageDto;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 import com.ithirteeng.messengerapi.chat.entity.ChatUserEntity;
+import com.ithirteeng.messengerapi.chat.entity.MessageEntity;
 import com.ithirteeng.messengerapi.chat.mapper.ChatMapper;
 import com.ithirteeng.messengerapi.chat.mapper.MessageMapper;
 import com.ithirteeng.messengerapi.chat.repository.ChatRepository;
@@ -12,12 +14,15 @@ import com.ithirteeng.messengerapi.chat.repository.MessageRepository;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageService {
@@ -118,5 +123,24 @@ public class MessageService {
         if (chatEntity.getIsDialog()) {
             // TODO: send notification
         }
+    }
+
+    @Transactional
+    public List<ShowMessageDto> getMessagesList(UUID chatId) {
+        var chatEntity = chatRepository.findById(chatId)
+                .orElseThrow(() -> new NotFoundException("Такого чата не существует!"));
+
+        var list = messageRepository.findAllByChatEntity(chatEntity);
+
+        return mapEntitiesList(list);
+    }
+
+    private List<ShowMessageDto> mapEntitiesList(List<MessageEntity> list) {
+        ArrayList<ShowMessageDto> result = new ArrayList<>();
+        for (MessageEntity entity : list) {
+            var user = commonService.getUserById(entity.getAuthorId());
+            result.add(MessageMapper.entityToshowMessageDto(entity, user.getFullName(), user.getAvatarId()));
+        }
+        return result;
     }
 }

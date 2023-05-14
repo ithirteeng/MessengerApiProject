@@ -2,6 +2,7 @@ package com.ithirteeng.messengerapi.chat.mapper;
 
 import com.ithirteeng.messengerapi.chat.dto.message.SendChatMessageDto;
 import com.ithirteeng.messengerapi.chat.dto.message.SendDialogueMessageDto;
+import com.ithirteeng.messengerapi.chat.dto.message.ShowMessageDto;
 import com.ithirteeng.messengerapi.chat.entity.ChatEntity;
 import com.ithirteeng.messengerapi.chat.entity.MessageEntity;
 
@@ -24,6 +25,16 @@ public class MessageMapper {
                 .authorId(targetUserId)
                 .messageText(sendChatMessageDto.getMessage())
                 .creationDate(new Date())
+                .build();
+    }
+
+    public static ShowMessageDto entityToshowMessageDto(MessageEntity messageEntity, String userName, UUID userAvatar) {
+        return ShowMessageDto.builder()
+                .messageId(messageEntity.getId())
+                .avatarId(userAvatar)
+                .senderName(userName)
+                .sendingTime(messageEntity.getCreationDate())
+                .message(messageEntity.getMessageText())
                 .build();
     }
 }
