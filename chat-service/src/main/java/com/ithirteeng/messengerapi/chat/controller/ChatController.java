@@ -43,7 +43,8 @@ public class ChatController {
     }
 
     @GetMapping("/messages/{chatId}")
-    public List<ShowMessageDto> getChatMessages(@PathVariable("chatId") UUID chatId) {
-        return messageService.getMessagesList(chatId);
+    public List<ShowMessageDto> getChatMessages(@PathVariable("chatId") UUID chatId, Authentication authentication) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return messageService.getMessagesList(chatId, userData.getId());
     }
 }

@@ -84,18 +84,21 @@ public class ChatService {
     public Object getChatInfoById(UUID chatId, UUID targetUserId) {
         var entity = chatRepository.findById(chatId)
                 .orElseThrow(() -> new NotFoundException("Такого чата не существует!"));
-
-        if (entity.getIsDialog()) {
-            var list = chatUserRepository.findAllByChatEntity(entity);
-            for (ChatUserEntity item : list) {
-                if (!item.getUserId().equals(targetUserId)) {
-                    var user = commonService.getUserById(item.getUserId());
-                    return ChatMapper.chatEntityToShowDialogueDto(entity, user.getFullName());
-                }
-            }
-            throw new NotFoundException("Такой чат не найден");
+        if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(targetUserId, entity)) {
+            throw new BadRequestException("Пользователь не является участником чата!");
         } else {
-            return ChatMapper.chatEntityToShowChatDto(entity);
+            if (entity.getIsDialog()) {
+                var list = chatUserRepository.findAllByChatEntity(entity);
+                for (ChatUserEntity item : list) {
+                    if (!item.getUserId().equals(targetUserId)) {
+                        var user = commonService.getUserById(item.getUserId());
+                        return ChatMapper.chatEntityToShowDialogueDto(entity, user.getFullName());
+                    }
+                }
+                throw new NotFoundException("Такой чат не найден");
+            } else {
+                return ChatMapper.chatEntityToShowChatDto(entity);
+            }
         }
     }
 }

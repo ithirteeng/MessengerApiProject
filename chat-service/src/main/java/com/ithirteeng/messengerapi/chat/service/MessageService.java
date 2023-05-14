@@ -117,22 +117,29 @@ public class MessageService {
         var chatEntity = chatRepository.findById(sendChatMessageDto.getChatId())
                 .orElseThrow(() -> new NotFoundException("Такого чата не существует!"));
 
-        var messageEntity = MessageMapper.sendChatMessageDtoToEntity(sendChatMessageDto, chatEntity, targetUserId);
-        messageRepository.save(messageEntity);
+        if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(targetUserId, chatEntity)) {
+            throw new BadRequestException("Пользователь не является участником чата!");
+        } else {
+            var messageEntity = MessageMapper.sendChatMessageDtoToEntity(sendChatMessageDto, chatEntity, targetUserId);
+            messageRepository.save(messageEntity);
 
-        if (chatEntity.getIsDialog()) {
-            // TODO: send notification
+            if (chatEntity.getIsDialog()) {
+                // TODO: send notification
+            }
         }
     }
 
     @Transactional
-    public List<ShowMessageDto> getMessagesList(UUID chatId) {
+    public List<ShowMessageDto> getMessagesList(UUID chatId, UUID targetUserId) {
         var chatEntity = chatRepository.findById(chatId)
                 .orElseThrow(() -> new NotFoundException("Такого чата не существует!"));
 
-        var list = messageRepository.findAllByChatEntity(chatEntity);
-
-        return mapEntitiesList(list);
+        if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(targetUserId, chatEntity)) {
+            throw new BadRequestException("Пользователь не является участником чата!");
+        } else {
+            var list = messageRepository.findAllByChatEntity(chatEntity);
+            return mapEntitiesList(list);
+        }
     }
 
     private List<ShowMessageDto> mapEntitiesList(List<MessageEntity> list) {
