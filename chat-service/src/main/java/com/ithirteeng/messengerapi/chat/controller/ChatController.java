@@ -49,7 +49,7 @@ public class ChatController {
     }
 
     @PostMapping("/list")
-    public OutputPageChatDto getChatMessages(@RequestBody InputChatPageDto inputChatPageDto, Authentication authentication) {
+    public OutputPageChatDto getChatMessages(@Validated @RequestBody InputChatPageDto inputChatPageDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return chatService.getPage(inputChatPageDto, userData.getId());
     }

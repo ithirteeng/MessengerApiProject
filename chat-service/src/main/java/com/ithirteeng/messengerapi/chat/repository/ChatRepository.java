@@ -17,6 +17,6 @@ public interface ChatRepository extends JpaRepository<ChatEntity, UUID> {
      * @param chatName wildcard фильтр
      * @return {@link List}<{@link ChatEntity}>
      */
-    @Query("SELECT c FROM ChatEntity c WHERE c.chatName LIKE %:chatName% OR c.chatName = null")
+    @Query("SELECT c FROM ChatEntity c WHERE lower(c.chatName) LIKE %:chatName% OR c.chatName = null")
     List<ChatEntity> findAllByChatNameLike(@Param("chatName") String chatName);
 }

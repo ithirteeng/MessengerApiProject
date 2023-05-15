@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * ДТО для поиска по имени с пагинацией
@@ -20,5 +21,6 @@ public class InputChatPageDto {
     @Valid
     private PageInfoDto pageInfo;
 
+    @NotNull(message = "Название чата не должно быть null!")
     private String chatName;
 }

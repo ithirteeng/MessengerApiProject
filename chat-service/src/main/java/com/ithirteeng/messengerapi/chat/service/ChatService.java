@@ -112,7 +112,7 @@ public class ChatService {
         }
 
         var correctChatsList = getUsersChats(chatUserRepository.findAllByUserId(targetUserId));
-        List<ChatEntity> fullNameList = chatRepository.findAllByChatNameLike(inputDto.getChatName());
+        List<ChatEntity> fullNameList = chatRepository.findAllByChatNameLike(inputDto.getChatName().toLowerCase());
 
         var outputList = intersection(correctChatsList, fullNameList);
         outputList.sort(Collections.reverseOrder((o1, o2) -> {
