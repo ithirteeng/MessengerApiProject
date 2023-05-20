@@ -1,11 +1,11 @@
 server:
   port: 1300
 spring:
-#  flyway:
-#    locations: classpath:migrations
-#    url: jdbc:postgresql://localhost:1393/notification_db
-#    user: notification_user
-#    password: notification_password
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:1393/notification_db
+    user: notification_user
+    password: notification_password
   datasource:
     url: jdbc:postgresql://localhost:1393/notification_db
     username: notification_user
@@ -13,7 +13,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
