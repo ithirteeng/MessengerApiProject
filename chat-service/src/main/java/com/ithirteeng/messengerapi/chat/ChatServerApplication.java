@@ -1,18 +1,16 @@
-package com.ithirteeng.messengerapi.friends;
+package com.ithirteeng.messengerapi.chat;
 
 import com.ithirteeng.messengerapi.common.security.EnableSpringSecurity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
-//@EnableRequestLogging
-@EnableSpringSecurity
-@ConfigurationPropertiesScan("com.ithirteeng.messengerapi")
 @SpringBootApplication
-public class FriendsServerApplication {
-
+@EnableSpringSecurity
+//@EnableRequestLogging
+@ConfigurationPropertiesScan("com.ithirteeng.messengerapi")
+public class ChatServerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(FriendsServerApplication.class, args);
+        SpringApplication.run(ChatServerApplication.class, args);
     }
-
 }

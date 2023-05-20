@@ -9,9 +9,6 @@ create table public.blacklist_table
     target_user      uuid
 );
 
-alter table public.blacklist_table
-    owner to ithirteeng;
-
 create table public.friend_table
 (
     id                 uuid not null
@@ -22,7 +19,4 @@ create table public.friend_table
     full_name          varchar(255),
     target_user        uuid
 );
-
-alter table public.friend_table
-    owner to ithirteeng;
 

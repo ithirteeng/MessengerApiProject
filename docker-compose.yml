@@ -1,0 +1,51 @@
+version: '3.9'
+services:
+  chat_db:
+    image: "postgres"
+    restart: unless-stopped
+    container_name: "chat_service"
+    ports:
+      - "1391:5432"
+    environment:
+      POSTGRES_USER: "chat_user"
+      POSTGRES_PASSWORD: "chat_password"
+      POSTGRES_DB: "chat_db"
+    volumes:
+      - "./postgres_data/chat:/var/lib/postgresql/data"
+
+  friends_db:
+    image: "postgres"
+    restart: unless-stopped
+    container_name: "friends_service"
+    ports:
+      - "1390:5432"
+    environment:
+      POSTGRES_USER: "friends_user"
+      POSTGRES_PASSWORD: "friends_password"
+      POSTGRES_DB: "friends_db"
+    volumes:
+      - "./postgres_data/friends:/var/lib/postgresql/data"
+
+  users_db:
+    image: "postgres"
+    restart: unless-stopped
+    container_name: "users_service"
+    ports:
+      - "1392:5432"
+    environment:
+      POSTGRES_USER: "users_user"
+      POSTGRES_PASSWORD: "users_password"
+      POSTGRES_DB: "users_db"
+    volumes:
+      - "./postgres_data/users:/var/lib/postgresql/data"
+
+  rabbit_mq:
+    image: "rabbitmq"
+    restart: unless-stopped
+    container_name: "rabbitmq_service"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "rmq-user"
+      RABBITMQ_DEFAULT_PASS: "rmq-pass"

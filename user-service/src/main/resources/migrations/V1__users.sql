@@ -17,6 +17,3 @@ create table public.user_table
     telephone_number  varchar(255)
 );
 
-alter table public.user_table
-    owner to ithirteeng;
-
