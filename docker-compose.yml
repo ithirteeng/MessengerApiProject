@@ -39,3 +39,13 @@ services:
     volumes:
       - "./postgres_data/users:/var/lib/postgresql/data"
 
+  rabbit_mq:
+    image: "rabbitmq"
+    restart: unless-stopped
+    container_name: "rabbitmq_service"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "rmq-user"
+      RABBITMQ_DEFAULT_PASS: "rmq-pass"
