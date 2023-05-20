@@ -248,17 +248,16 @@ public class BlackListService {
      * Метод для обновления поля fullName для всех записей в БД
      *
      * @param externalUserId Id внешнего пользователя
-     * @param targetUserId   Id целевого пользователя
      * @throws NotFoundException в случае, если пользователя нет в ЧС
      */
     @Transactional
-    public void updateFullNameFields(UUID externalUserId, UUID targetUserId) {
+    public void updateFullNameFields(UUID externalUserId) {
         commonService.checkUserExisting(externalUserId);
         var user = commonService.getUserById(externalUserId);
 
-        if (!blackListRepository.existsByTargetUserIdAndAddingUserId(targetUserId, externalUserId)) {
-            throw new NotFoundException("Пользователя нет в черном списке!");
-        }
+//        if (!blackListRepository.existsByTargetUserIdAndAddingUserId(targetUserId, externalUserId)) {
+//            throw new NotFoundException("Пользователя нет в черном списке!");
+//        }
 
         blackListRepository.updateFullNameByAddingUserId(externalUserId, user.getFullName());
     }

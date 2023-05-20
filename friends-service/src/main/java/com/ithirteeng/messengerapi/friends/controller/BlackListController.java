@@ -58,7 +58,7 @@ public class BlackListController {
     @PatchMapping(value = "/{id}/update")
     public void updateFriendsFullName(@PathVariable("id") UUID id, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
-        blackListService.updateFullNameFields(id, userData.getId());
+        blackListService.updateFullNameFields(id);
     }
 
     @GetMapping(value = "/check/{id}")

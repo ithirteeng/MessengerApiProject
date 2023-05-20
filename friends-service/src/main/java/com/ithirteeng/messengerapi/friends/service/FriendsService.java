@@ -227,17 +227,16 @@ public class FriendsService {
      * Метод для обновления поля fullName для всех записей в БД
      *
      * @param friendId     Id внешнего пользователя
-     * @param targetUserId Id целевого пользователя
      * @throws NotFoundException в случае, если пользователя нет в друзьях
      */
     @Transactional
-    public void updateFullNameFields(UUID friendId, UUID targetUserId) {
+    public void updateFullNameFields(UUID friendId) {
         commonService.checkUserExisting(friendId);
         var user = commonService.getUserById(friendId);
 
-        if (!friendsRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
-            throw new NotFoundException("Пользователя нет в ваших друзьях!");
-        }
+//        if (!friendsRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
+//            throw new NotFoundException("Пользователя нет в ваших друзьях!");
+//        }
 
         friendsRepository.updateFullNameByAddingUserId(friendId, user.getFullName());
     }

@@ -14,6 +14,7 @@ import com.ithirteeng.messengerapi.user.mapper.UserMapper;
 import com.ithirteeng.messengerapi.user.repository.UserRepository;
 import com.ithirteeng.messengerapi.user.utils.helper.PasswordHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class UserService {
     private final CheckPaginationDetailsService paginationDetailsService;
 
     private final SecurityProps securityProps;
+
+    private final StreamBridge streamBridge;
 
     /**
      * Метод для получения данных о пользователе по id
@@ -116,7 +119,12 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Такого пользователя не существует"));
         entity = UserMapper.updateUserFields(entity, updateProfileDto);
         repository.save(entity);
+        syncUserData(entity.getId());
         return UserMapper.entityToUserDto(entity);
+    }
+
+    private void syncUserData(UUID userId) {
+        streamBridge.send("userDataSyncEvent-out-0", userId);
     }
 
     /**

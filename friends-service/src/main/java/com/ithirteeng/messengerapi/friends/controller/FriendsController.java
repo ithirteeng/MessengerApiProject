@@ -58,7 +58,7 @@ public class FriendsController {
     @PatchMapping(value = "/{id}/update")
     public void updateFriendsFullName(@PathVariable("id") UUID id, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
-        friendsService.updateFullNameFields(id, userData.getId());
+        friendsService.updateFullNameFields(id);
     }
 
 }
