@@ -14,6 +14,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:rmq-user}
+    password: ${RABBITMQ_PASSWORD:rmq-pass}
+  cloud.stream.bindings:
+    notificationEvent-out-0:
+      destination: ${app.id}_NOTIFICATION_EVENT
 
 app:
   jwt-token:

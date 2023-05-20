@@ -22,6 +22,8 @@ spring:
   cloud.stream.bindings:
     userDataSyncEvent-in-0:
       destination: ${app.id}_USER_DATA_SYNC_EVENT
+    notificationEvent-out-0:
+      destination: ${app.id}_NOTIFICATION_EVENT
 
 app:
   jwt-token:
