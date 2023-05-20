@@ -47,9 +47,13 @@ public class ChatService {
     public ChatDto createChat(CreateChatDto createChatDto, UUID targetUserId) {
         var entity = ChatMapper.createChatDtoToChatEntity(createChatDto, targetUserId);
 
-        chatRepository.save(entity);
+        if (entity.getChatUserEntitiesList().size() <= 2) {
+            throw new BadRequestException("В чате должно быть больше двух учасников!");
+        }
 
+        chatRepository.save(entity);
         addUsersToChat(createChatDto.getUsersIdsList(), targetUserId, entity);
+
 
         return ChatMapper.chatEntityToChatDto(entity);
     }

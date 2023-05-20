@@ -9,13 +9,18 @@ import com.ithirteeng.messengerapi.chat.mapper.MessageMapper;
 import com.ithirteeng.messengerapi.chat.repository.ChatRepository;
 import com.ithirteeng.messengerapi.chat.repository.ChatUserRepository;
 import com.ithirteeng.messengerapi.chat.repository.MessageRepository;
+import com.ithirteeng.messengerapi.common.enums.NotificationType;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.CreateNotificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +38,8 @@ public class MessageService {
     private final ChatRepository chatRepository;
 
     private final MessageRepository messageRepository;
+
+    private final StreamBridge streamBridge;
 
     @Transactional
     public void sendMessageInDialogue(SendDialogueMessageDto sendDialogueMessageDto, UUID targetUserId) {
@@ -54,6 +61,23 @@ public class MessageService {
         entity.setLasMessageAuthorId(messageEntity.getAuthorId());
 
         chatRepository.save(entity);
+        sendNotificationToUser(sendDialogueMessageDto.getUserId(), sendDialogueMessageDto.getMessage(), targetUserId);
+    }
+
+    private void sendNotificationToUser(UUID externalUserId, String message, UUID targetUserId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = LocalDateTime.now().format(formatter);
+        var userData = commonService.getUserById(targetUserId);
+        var dto = CreateNotificationDto.builder()
+                .userId(externalUserId)
+                .text("Новое сообщение от пользователя с id " + targetUserId
+                        + " и ФИО: " + userData.getFullName() + ". Время отправки сообщения: "
+                        + formattedDateTime + ". Сообщение: '"
+                        + message.substring(0, Math.min(message.length(), 100))
+                        + "'")
+                .type(NotificationType.MESSAGE)
+                .build();
+        sendNotification(dto);
     }
 
     @Transactional
@@ -135,7 +159,14 @@ public class MessageService {
             chatRepository.save(chatEntity);
 
             if (chatEntity.getIsDialog()) {
-                // TODO: send notification
+                List<ChatUserEntity> data = chatUserRepository.findAllByChatEntity(chatEntity);
+                UUID externalUserId;
+                if (!data.get(0).getUserId().equals(targetUserId)) {
+                    externalUserId = data.get(0).getUserId();
+                } else {
+                    externalUserId = data.get(1).getUserId();
+                }
+                sendNotificationToUser(externalUserId, sendChatMessageDto.getMessage(), targetUserId);
             }
         }
     }
@@ -206,6 +237,15 @@ public class MessageService {
             }
         }
         return false;
+    }
+
+    /**
+     * Метод для отслания уведомления
+     *
+     * @param dto ДТО для создания уведомления
+     */
+    private void sendNotification(CreateNotificationDto dto) {
+        streamBridge.send("notificationEvent-out-0", dto);
     }
 
 }
