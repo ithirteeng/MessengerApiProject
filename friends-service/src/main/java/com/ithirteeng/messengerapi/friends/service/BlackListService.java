@@ -1,8 +1,10 @@
 package com.ithirteeng.messengerapi.friends.service;
 
+import com.ithirteeng.messengerapi.common.enums.NotificationType;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.CreateNotificationDto;
 import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
 import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
@@ -17,6 +19,7 @@ import com.ithirteeng.messengerapi.friends.mapper.PageMapper;
 import com.ithirteeng.messengerapi.friends.repository.BlackListRepository;
 import com.ithirteeng.messengerapi.friends.repository.FriendsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +27,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +48,8 @@ public class BlackListService {
     private final CommonService commonService;
 
     private final CheckPaginationDetailsService paginationDetailsService;
+
+    private final StreamBridge streamBridge;
 
     /**
      * Метод для получение данных о записи в ЧС
@@ -85,6 +92,15 @@ public class BlackListService {
         var externalUser = commonService.getUserById(externalUserId);
 
         addNoteToTargetUser(targetUserId, externalUser);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = LocalDateTime.now().format(formatter);
+        var dto = CreateNotificationDto.builder()
+                .userId(externalUserId)
+                .text("Вас добавил в ЧС в " + formattedDateTime + " пользователь с id: " + targetUserId)
+                .type(NotificationType.BLACKLIST_ADD)
+                .build();
+        sendNotification(dto);
         try {
             deleteFriend(externalUserId, targetUserId);
         } catch (Exception e) {
@@ -170,6 +186,15 @@ public class BlackListService {
         } else {
             entity.setDeleteNoteDate(new Date());
             blackListRepository.save(entity);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = LocalDateTime.now().format(formatter);
+            var dto = CreateNotificationDto.builder()
+                    .userId(externalUserId)
+                    .text("Вас удалил из ЧС в " + formattedDateTime + " пользователь с id: " + targetUserId)
+                    .type(NotificationType.BLACKLIST_REMOVE)
+                    .build();
+            sendNotification(dto);
         }
     }
 
@@ -284,5 +309,14 @@ public class BlackListService {
     @Transactional
     public Boolean checkIfUserInBlackList(UUID targetUserId, UUID externalUserId) {
         return blackListRepository.existsByTargetUserIdAndAddingUserIdAndDeleteNoteDate(targetUserId, externalUserId, null);
+    }
+
+    /**
+     * Метод для отслания уведомления
+     *
+     * @param dto ДТО для создания уведомления
+     */
+    private void sendNotification(CreateNotificationDto dto) {
+        streamBridge.send("notificationEvent-out-0", dto);
     }
 }

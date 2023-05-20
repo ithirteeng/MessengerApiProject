@@ -1,8 +1,10 @@
 package com.ithirteeng.messengerapi.friends.service;
 
+import com.ithirteeng.messengerapi.common.enums.NotificationType;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.ConflictException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.CreateNotificationDto;
 import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.service.CheckPaginationDetailsService;
 import com.ithirteeng.messengerapi.common.service.EnablePaginationService;
@@ -16,6 +18,7 @@ import com.ithirteeng.messengerapi.friends.mapper.FriendsMapper;
 import com.ithirteeng.messengerapi.friends.mapper.PageMapper;
 import com.ithirteeng.messengerapi.friends.repository.FriendsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +47,8 @@ public class FriendsService {
     private final CheckPaginationDetailsService paginationDetailsService;
 
     private final BlackListService blackListService;
+
+    private final StreamBridge streamBridge;
 
     /**
      * Метод для получения данных о друге
@@ -93,6 +100,15 @@ public class FriendsService {
 
         addFriendToTargetUser(friendId, targetUser);
         addFriendToTargetUser(targetUserId, externalUser);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = LocalDateTime.now().format(formatter);
+        var dto = CreateNotificationDto.builder()
+                .userId(friendId)
+                .text("Вас добавил в друзья в " + formattedDateTime + " пользователь с id: " + targetUserId)
+                .type(NotificationType.FRIENDS_ADD)
+                .build();
+        sendNotification(dto);
     }
 
     /**
@@ -150,6 +166,15 @@ public class FriendsService {
 
             friendsRepository.save(entity);
             friendsRepository.save(entity2);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = LocalDateTime.now().format(formatter);
+            var dto = CreateNotificationDto.builder()
+                    .userId(friendId)
+                    .text("Вас удалил из друзей в " + formattedDateTime + " пользователь с id: " + targetUserId)
+                    .type(NotificationType.FRIENDS_REMOVE)
+                    .build();
+            sendNotification(dto);
         }
     }
 
@@ -226,7 +251,7 @@ public class FriendsService {
     /**
      * Метод для обновления поля fullName для всех записей в БД
      *
-     * @param friendId     Id внешнего пользователя
+     * @param friendId Id внешнего пользователя
      * @throws NotFoundException в случае, если пользователя нет в друзьях
      */
     @Transactional
@@ -244,7 +269,7 @@ public class FriendsService {
     /**
      * Метод для проверки, являются ли пользватели друзьями
      *
-     * @param targetUserId ID целевого юзера
+     * @param targetUserId   ID целевого юзера
      * @param externalUserId ID внешнего пользователя
      * @return {@link Boolean}
      */
@@ -253,5 +278,13 @@ public class FriendsService {
         return friendsRepository.existsByAddingUserIdAndTargetUserId(externalUserId, targetUserId);
     }
 
+    /**
+     * Метод для отслания уведомления
+     *
+     * @param dto ДТО для создания уведомления
+     */
+    private void sendNotification(CreateNotificationDto dto) {
+        streamBridge.send("notificationEvent-out-0", dto);
+    }
 
 }
