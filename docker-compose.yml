@@ -13,6 +13,19 @@ services:
     volumes:
       - "./postgres_data/chat:/var/lib/postgresql/data"
 
+  notification_db:
+    image: "postgres"
+    restart: unless-stopped
+    container_name: "notification_service"
+    ports:
+      - "1393:5432"
+    environment:
+      POSTGRES_USER: "notification_user"
+      POSTGRES_PASSWORD: "notification_password"
+      POSTGRES_DB: "notification_db"
+    volumes:
+      - "./postgres_data/notification:/var/lib/postgresql/data"
+
   friends_db:
     image: "postgres"
     restart: unless-stopped
