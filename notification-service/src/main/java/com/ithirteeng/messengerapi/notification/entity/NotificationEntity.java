@@ -1,6 +1,7 @@
 package com.ithirteeng.messengerapi.notification.entity;
 
-import com.ithirteeng.messengerapi.notification.enums.NotificationType;
+import com.ithirteeng.messengerapi.common.enums.NotificationType;
+import com.ithirteeng.messengerapi.notification.enums.NotificationStatus;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -32,8 +33,8 @@ public class NotificationEntity {
     @Column(name = "user_id")
     private UUID userId;
 
-    @Column(name = "is_read")
-    private Boolean isRead;
+    @Column(name = "status")
+    private NotificationStatus status;
 
     @Column(name = "read_time")
     private LocalDateTime readTime;

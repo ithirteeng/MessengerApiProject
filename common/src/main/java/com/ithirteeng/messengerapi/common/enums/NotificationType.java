@@ -1,4 +1,4 @@
-package com.ithirteeng.messengerapi.notification.enums;
+package com.ithirteeng.messengerapi.common.enums;
 
 public enum NotificationType {
     FRIENDS_ADD,
