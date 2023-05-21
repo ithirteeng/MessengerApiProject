@@ -13,4 +13,6 @@ public class PageInfoDto {
 
     private Integer pageSize;
 
+    private Integer pagesCount;
+
 }

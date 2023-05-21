@@ -88,7 +88,7 @@ public class NotificationService {
 
         NotificationsPageListDto result = new NotificationsPageListDto();
         result.setNotificationsList(resultList);
-        result.setPageInfo(new PageInfoDto(pageNumber, pageSize));
+        result.setPageInfo(new PageInfoDto(pageNumber, pageSize, notificationsPage.getTotalPages()));
 
         return result;
     }
