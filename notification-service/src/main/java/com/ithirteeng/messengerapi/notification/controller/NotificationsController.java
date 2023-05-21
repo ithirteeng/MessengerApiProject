@@ -1,6 +1,8 @@
 package com.ithirteeng.messengerapi.notification.controller;
 
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
+import com.ithirteeng.messengerapi.notification.dto.NotificationsPageListDto;
+import com.ithirteeng.messengerapi.notification.dto.PageFiltersDto;
 import com.ithirteeng.messengerapi.notification.dto.UpdateStatusDto;
 import com.ithirteeng.messengerapi.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,20 @@ public class NotificationsController {
     }
 
     @PostMapping("/status")
-    public Integer updateNotificationsStatus(@Validated @RequestBody UpdateStatusDto updateStatusDto, Authentication authentication) {
+    public Integer updateNotificationsStatus(
+            @Validated @RequestBody UpdateStatusDto updateStatusDto,
+            Authentication authentication
+    ) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return notificationService.setStatusToNotifications(updateStatusDto, userData.getId());
+    }
+
+    @PostMapping("/list")
+    public NotificationsPageListDto getNotifications(
+            @Validated @RequestBody PageFiltersDto pageFiltersDto,
+            Authentication authentication
+    ) {
+        var userData = (JwtUserDetails) authentication.getPrincipal();
+        return notificationService.getNotifications(pageFiltersDto, userData.getId());
     }
 }

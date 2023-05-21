@@ -10,11 +10,11 @@ import java.util.UUID;
 
 public class NotificationSpecification {
 
-    public static Specification<NotificationEntity> receivedDateAfter(LocalDateTime dateTime) {
+    public static Specification<NotificationEntity> greaterReceivedDate(LocalDateTime dateTime) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("receiveTime"), dateTime);
     }
 
-    public static Specification<NotificationEntity> receivedDateBefore(LocalDateTime dateTime) {
+    public static Specification<NotificationEntity> lessReceivedDate(LocalDateTime dateTime) {
         return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("receiveTime"), dateTime);
     }
 

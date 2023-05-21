@@ -15,6 +15,4 @@ public class NotificationsPageListDto {
 
     private PageInfoDto pageInfo;
 
-    private NotificationsFiltersDto filters;
-
 }
