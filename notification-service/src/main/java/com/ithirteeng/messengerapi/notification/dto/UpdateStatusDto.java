@@ -14,10 +14,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class UpdateNotificationStatusDto {
+public class UpdateStatusDto {
 
     @NotEmpty(message = "Список id уведомлений не может быть пустым!")
-    private List<UUID> notificationsIDs;
+    private List<UUID> notificationsList;
 
     @NotNull(message = "Статус сообщений обязателен!")
     private NotificationStatus status;
