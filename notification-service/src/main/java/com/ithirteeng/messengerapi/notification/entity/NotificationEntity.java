@@ -12,6 +12,9 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Entity уведомления
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

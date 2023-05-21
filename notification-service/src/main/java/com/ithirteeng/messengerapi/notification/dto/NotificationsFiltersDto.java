@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.util.List;
 
-
+/**
+ * ДТО для фильтров выборки уведомлений
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

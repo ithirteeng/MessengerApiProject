@@ -10,6 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для запросов для уведомлений
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notifications")

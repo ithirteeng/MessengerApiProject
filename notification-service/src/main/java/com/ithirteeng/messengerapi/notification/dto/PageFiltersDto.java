@@ -2,6 +2,9 @@ package com.ithirteeng.messengerapi.notification.dto;
 
 import lombok.*;
 
+/**
+ * ДТО для информации о пагинации и фильтрах выборки
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

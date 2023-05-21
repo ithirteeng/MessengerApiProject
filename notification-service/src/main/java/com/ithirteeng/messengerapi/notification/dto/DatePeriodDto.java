@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * ДТО для периода создания уведолений
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

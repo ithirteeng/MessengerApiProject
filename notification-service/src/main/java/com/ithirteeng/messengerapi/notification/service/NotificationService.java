@@ -29,17 +29,36 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    /**
+     * Метод для создания уведомления
+     *
+     * @param dto ДТО ({@link CreateNotificationDto}) для создания уведомления
+     */
     @Transactional
     public void createNotification(CreateNotificationDto dto) {
         var entity = NotificationMapper.entityFromCreateDto(dto);
         notificationRepository.save(entity);
     }
 
+    /**
+     * Метод для подсчета непрочитанных уведомлений пользователя
+     *
+     * @param userId идентификатор пользователя
+     * @return {@link Integer}
+     */
     @Transactional(readOnly = true)
     public Integer countNotReadNotifications(UUID userId) {
         return notificationRepository.countByUserIdAndStatus(userId, NotificationStatus.NOT_READ);
     }
 
+    /**
+     * Методя для обновления статуса списка уведомлений пользователя
+     *
+     * @param updateStatusDto ДТО ({@link UpdateStatusDto}) для обновления статусов уведомлений
+     * @param userId идентификатор пользователя
+     * @return {@link Integer}
+     * @throws NotFoundException в случае, когда уведомление пользователя не существует
+     */
     @Transactional
     public Integer setStatusToNotifications(UpdateStatusDto updateStatusDto, UUID userId) {
         List<UUID> invalidIds = new ArrayList<>();
@@ -67,6 +86,13 @@ public class NotificationService {
         return countNotReadNotifications(userId);
     }
 
+    /**
+     * Метод для получения ДТО с данными и информацией о пагинации по параметрам
+     *
+     * @param pageFiltersDto ДТО ({@link PageFiltersDto}) с информацией о пагинации
+     * @param userId идентификатор пользователя
+     * @return {@link NotificationsPageListDto}
+     */
     @Transactional
     public NotificationsPageListDto getNotifications(PageFiltersDto pageFiltersDto, UUID userId) {
         int pageNumber = getPageNumber(pageFiltersDto);
@@ -93,6 +119,13 @@ public class NotificationService {
         return result;
     }
 
+    /**
+     * Метод, создающий спецификацию по данным
+     *
+     * @param filters ДТО ({@link NotificationsFiltersDto}) с фильтрами для уведомлений
+     * @param userId идентификатор пользователя
+     * @return {@link Specification}<{@link NotificationEntity}>
+     */
     private Specification<NotificationEntity> setupSpecification(NotificationsFiltersDto filters, UUID userId) {
         Specification<NotificationEntity> specification = Specification.where(NotificationSpecification.userIdEqual(userId));
         if (filters != null) {
@@ -118,6 +151,13 @@ public class NotificationService {
         return specification;
     }
 
+    /**
+     * Метод для получения номера страницы по даным о пагинации
+     *
+     * @param pageFiltersDto ДТО ({@link PageFiltersDto}) с данными для пагинации
+     * @return  номер страницы
+     * @throws BadRequestException в случае неорректной страницы
+     */
     private int getPageNumber(PageFiltersDto pageFiltersDto) {
         int pageNumber = 1;
         if (pageFiltersDto.getPageInfo().getPageNumber() != null) {
@@ -129,6 +169,13 @@ public class NotificationService {
         return pageNumber;
     }
 
+    /**
+     * Метод для получения размера страницы по даным о пагинации
+     *
+     * @param pageFiltersDto ДТО ({@link PageFiltersDto}) с данными для пагинации
+     * @return размер страницы
+     * @throws BadRequestException в случае неорректной страницы
+     */
     private int getPageSize(PageFiltersDto pageFiltersDto) {
         int pageSize = 10;
         if (pageFiltersDto.getPageInfo().getPageSize() != null) {

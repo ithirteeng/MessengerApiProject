@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.util.UUID;
 
+/**
+ * ДТО уведомлений
+ */
 @Data
 @Getter
 @Builder

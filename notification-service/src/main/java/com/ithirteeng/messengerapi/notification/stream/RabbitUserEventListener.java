@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.function.Consumer;
 
+/**
+ * Класс-обработчик событий, связанных с новыми уведомлениями из RabbitMQ
+ */
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -16,6 +19,11 @@ public class RabbitUserEventListener {
 
     private final NotificationService notificationService;
 
+    /**
+     * Метод для обрабатки событий создания уведомлений. Создает новое уведомление по ДТО {@link CreateNotificationDto}
+     *
+     * @return {@link Consumer}<{@link CreateNotificationDto}> - consumer, обрабатывающий событие создания уведомления
+     */
     @Bean
     public Consumer<CreateNotificationDto> notificationEvent() {
         return notificationService::createNotification;
