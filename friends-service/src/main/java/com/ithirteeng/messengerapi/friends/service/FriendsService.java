@@ -259,10 +259,6 @@ public class FriendsService {
         commonService.checkUserExisting(friendId);
         var user = commonService.getUserById(friendId);
 
-//        if (!friendsRepository.existsByAddingUserIdAndTargetUserId(friendId, targetUserId)) {
-//            throw new NotFoundException("Пользователя нет в ваших друзьях!");
-//        }
-
         friendsRepository.updateFullNameByAddingUserId(friendId, user.getFullName());
     }
 
@@ -279,7 +275,7 @@ public class FriendsService {
     }
 
     /**
-     * Метод для отслания уведомления
+     * Метод для отсылания уведомления в сервис уведомлений через {@link StreamBridge}
      *
      * @param dto ДТО для создания уведомления
      */

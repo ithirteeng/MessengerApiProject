@@ -280,10 +280,6 @@ public class BlackListService {
         commonService.checkUserExisting(externalUserId);
         var user = commonService.getUserById(externalUserId);
 
-//        if (!blackListRepository.existsByTargetUserIdAndAddingUserId(targetUserId, externalUserId)) {
-//            throw new NotFoundException("Пользователя нет в черном списке!");
-//        }
-
         blackListRepository.updateFullNameByAddingUserId(externalUserId, user.getFullName());
     }
 
@@ -312,7 +308,7 @@ public class BlackListService {
     }
 
     /**
-     * Метод для отслания уведомления
+     * Метод для отсылания уведомления в сервис уведомлений через {@link StreamBridge}
      *
      * @param dto ДТО для создания уведомления
      */

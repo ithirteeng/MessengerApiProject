@@ -123,6 +123,11 @@ public class UserService {
         return UserMapper.entityToUserDto(entity);
     }
 
+    /**
+     * Метод для синхронизации имени пользователя через {@link StreamBridge}
+     *
+     * @param userId идентификатор пользователя
+     */
     private void syncUserData(UUID userId) {
         streamBridge.send("userDataSyncEvent-out-0", userId);
     }

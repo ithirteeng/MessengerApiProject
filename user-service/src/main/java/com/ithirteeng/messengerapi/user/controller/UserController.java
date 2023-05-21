@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 import static com.ithirteeng.messengerapi.common.consts.RequestsConstants.AUTHORIZATION_HEADER;
 
 /**
- * RestController для user - модуля
+ * Контроллер для всех запросов, связанных с пользователями
  */
 @RestController
 @RequestMapping("/api/users")
@@ -59,6 +59,11 @@ public class UserController {
                 .body(body);
     }
 
+    /**
+     * Метод для отсылания уведомления в сервис уведомлений через {@link StreamBridge}
+     *
+     * @param dto ДТО для создания уведомления
+     */
     private void sendNotification(CreateNotificationDto dto) {
         streamBridge.send("notificationEvent-out-0", dto);
     }
