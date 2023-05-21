@@ -15,8 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
+/**
+ * Сервис для работы с чатами
+ */
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -29,6 +35,12 @@ public class ChatService {
 
     private final MessageRepository messageRepository;
 
+    /**
+     * Метод для добавления пользователя в чат
+     *
+     * @param chatEntity чат типа {@link ChatEntity}
+     * @param userId идентификатор пользователя
+     */
     @Transactional
     public void addChatToUser(ChatEntity chatEntity, UUID userId) {
         if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(userId, chatEntity)) {
@@ -43,6 +55,14 @@ public class ChatService {
 
     }
 
+    /**
+     * Метод для создания чата
+     *
+     * @param createChatDto ДТО для создания чата ({@link CreateChatDto})
+     * @param targetUserId идентификатор пользователя
+     * @return {@link ChatDto}
+     * @throws BadRequestException в случае, если при созданиии было указано меньше 3 пользователей
+     */
     @Transactional
     public ChatDto createChat(CreateChatDto createChatDto, UUID targetUserId) {
         var entity = ChatMapper.createChatDtoToChatEntity(createChatDto, targetUserId);
@@ -58,6 +78,14 @@ public class ChatService {
         return ChatMapper.chatEntityToChatDto(entity);
     }
 
+    /**
+     * Метод для обновления чата
+     *
+     * @param updateChatDto ДТО для обновления чата ({@link UpdateChatDto})
+     * @param targetUserId идентификатор пользователя
+     * @return {@link ChatDto}
+     * @throws NotFoundException при условии несуществования чата
+     */
     @Transactional
     public ChatDto updateChat(UpdateChatDto updateChatDto, UUID targetUserId) {
         var entity = chatRepository.findById(updateChatDto.getChatId())
@@ -72,6 +100,14 @@ public class ChatService {
         return ChatMapper.chatEntityToChatDto(updatedEntity);
     }
 
+    /**
+     * Методя для добавления пользователей в чат
+     *
+     * @param usersIdsList список идентификаторов пользователей
+     * @param targetUserId идентификатор целевого пользователя
+     * @param chatEntity чат типа {@link ChatEntity}
+     * @throws BadRequestException в случае, когда целевой пользователь пытается добавить сам себя в создаваемый им чат
+     */
     private void addUsersToChat(List<UUID> usersIdsList, UUID targetUserId, ChatEntity chatEntity) {
         for (UUID userId : usersIdsList) {
             commonService.checkUserExisting(userId);
@@ -86,6 +122,15 @@ public class ChatService {
         addChatToUser(chatEntity, targetUserId);
     }
 
+    /**
+     * Получение информации о чате по его идентификатору
+     *
+     * @param chatId идентификатор чата
+     * @param targetUserId идентификатор пользователя
+     * @return {@link ShowDialogueDto} или {@link ShowChatDto} в зависимости от типа чата
+     * @throws BadRequestException в случае, когда пользователь не является учасником чата
+     * @throws NotFoundException в случае несуществования чата
+     */
     @Transactional(readOnly = true)
     public Object getChatInfoById(UUID chatId, UUID targetUserId) {
         var entity = chatRepository.findById(chatId)
@@ -108,6 +153,13 @@ public class ChatService {
         }
     }
 
+    /**
+     * Метод для получения чатов с пагинацией
+     *
+     * @param inputDto ДТО с информацией по пагинации
+     * @param targetUserId идентификатор пользователя
+     * @return {@link OutputPageChatDto}
+     */
     @Transactional
     public OutputPageChatDto getPage(InputChatPageDto inputDto, UUID targetUserId) {
         var paginationInfo = inputDto.getPageInfo();
@@ -131,6 +183,12 @@ public class ChatService {
         return ChatMapper.getPageFromData(resultList, paginationInfo, totalPagesCount);
     }
 
+    /**
+     * Метод для получения чатов по их идентификаторам
+     *
+     * @param idsList список объектов чат-юзер типа {@link ChatUserEntity}
+     * @return {@link List}<{@link ChatEntity}>
+     */
     private List<ChatEntity> getUsersChats(List<ChatUserEntity> idsList) {
         var result = new ArrayList<ChatEntity>();
 
@@ -140,6 +198,13 @@ public class ChatService {
         return result;
     }
 
+    /**
+     * Метод для конвертации списка объектов {@link ChatEntity} в список объектов {@link PageChatDto}
+     *
+     * @param list список объектов {@link ChatEntity}
+     * @return список объектов {@link PageChatDto}
+     * @throws NotFoundException в случае, если сообщения не существует
+     */
     public List<PageChatDto> entitiesListToPageDtoList(List<ChatEntity> list) {
         ArrayList<PageChatDto> result = new ArrayList<>();
         for (ChatEntity entity : list) {

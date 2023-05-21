@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * ДТО для показа данных с пагинацией
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

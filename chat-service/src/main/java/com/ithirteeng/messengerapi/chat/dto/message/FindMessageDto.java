@@ -4,6 +4,9 @@ import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * ДТО для поиска сообщения
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

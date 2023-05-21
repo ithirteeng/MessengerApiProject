@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.Date;
 
+/**
+ * ДТО для показа диалога
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

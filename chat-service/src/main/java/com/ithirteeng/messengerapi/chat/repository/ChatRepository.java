@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Репозиторий для работы с чатами
+ */
 @Repository
 public interface ChatRepository extends JpaRepository<ChatEntity, UUID> {
     /**

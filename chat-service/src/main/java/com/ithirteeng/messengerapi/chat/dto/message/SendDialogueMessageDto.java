@@ -6,6 +6,9 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ДТО для отправки сообщения в диалог
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

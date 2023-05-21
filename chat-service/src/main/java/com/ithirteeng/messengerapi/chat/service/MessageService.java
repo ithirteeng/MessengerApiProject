@@ -26,6 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис для работы с сообщениями
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,13 @@ public class MessageService {
 
     private final StreamBridge streamBridge;
 
+    /**
+     * Метод для отправки сообщения в диалог, если сообщение - первое, то еще и создается диалог
+     *
+     * @param sendDialogueMessageDto ДТО ({@link SendDialogueMessageDto}) для отправки сообщения
+     * @param targetUserId           идентификатор целевого пользователя
+     * @throws BadRequestException в случае попытки отослать самому себе сообщение
+     */
     @Transactional
     public void sendMessageInDialogue(SendDialogueMessageDto sendDialogueMessageDto, UUID targetUserId) {
         if (sendDialogueMessageDto.getUserId().equals(targetUserId)) {
@@ -64,6 +74,13 @@ public class MessageService {
         sendNotificationToUser(sendDialogueMessageDto.getUserId(), sendDialogueMessageDto.getMessage(), targetUserId);
     }
 
+    /**
+     * Метод для отправки уведомления внешнему пользователю о сообщении
+     *
+     * @param externalUserId идентификатор внешнего пользователя
+     * @param message        сообщение
+     * @param targetUserId   идентификатор уелевого пользователя
+     */
     private void sendNotificationToUser(UUID externalUserId, String message, UUID targetUserId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = LocalDateTime.now().format(formatter);
@@ -80,6 +97,13 @@ public class MessageService {
         sendNotification(dto);
     }
 
+    /**
+     * Методя для создания диалога
+     *
+     * @param sendDialogueMessageDto ДТО ({@link SendDialogueMessageDto}) для отправки сообщения
+     * @param targetUserId           идентификатор целевого пользователя
+     * @return {@link ChatEntity}
+     */
     @Transactional
     ChatEntity createDialogue(SendDialogueMessageDto sendDialogueMessageDto, UUID targetUserId) {
         var result = checkIfDialogueCreated(sendDialogueMessageDto.getUserId(), targetUserId);
@@ -97,6 +121,13 @@ public class MessageService {
         }
     }
 
+    /**
+     * Метод для проверки, был ли уже создан диалог
+     *
+     * @param externalUserId идентификатор внешнего пользователя
+     * @param targetUserId   идентификатор целевого пользователя
+     * @return {@link ChatEntity}
+     */
     @Transactional
     ChatEntity checkIfDialogueCreated(UUID externalUserId, UUID targetUserId) {
         var targetList = chatUserRepository.findAllByUserId(targetUserId);
@@ -115,6 +146,13 @@ public class MessageService {
         return null;
     }
 
+    /**
+     * Метод для проверки сущестования записи чат-юзер по чату
+     *
+     * @param list   список с объектами типа чат-юзер {@link ChatUserEntity}
+     * @param entity {@link ChatEntity} чат
+     * @return {@link Boolean}
+     */
     private boolean containsByEntity(List<ChatUserEntity> list, ChatEntity entity) {
         if (!entity.getIsDialog()) {
             return false;
@@ -127,6 +165,12 @@ public class MessageService {
         return false;
     }
 
+    /**
+     * Метод для добавления в БД запись типа чат-юзер
+     *
+     * @param chatEntity объект чата {@link ChatEntity}
+     * @param userId     идентификатор юзера
+     */
     @Transactional
     void addChatToUser(ChatEntity chatEntity, UUID userId) {
         if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(userId, chatEntity)) {
@@ -141,6 +185,14 @@ public class MessageService {
 
     }
 
+    /**
+     * Метод для отправки сообщения в чат
+     *
+     * @param sendChatMessageDto ДТО ({@link SendChatMessageDto}) для отправки сообщения в чат
+     * @param targetUserId идентификатор целевого пользователя
+     * @throws NotFoundException в случае несуществования чата
+     * @throws BadRequestException в случае когда пользователь не является участником чата
+     */
     @Transactional
     public void sendMessageInChat(SendChatMessageDto sendChatMessageDto, UUID targetUserId) {
         var chatEntity = chatRepository.findById(sendChatMessageDto.getChatId())
@@ -171,6 +223,15 @@ public class MessageService {
         }
     }
 
+    /**
+     * Метод для получения списка сообщений
+     *
+     * @param chatId идентификатор чата
+     * @param targetUserId идентификатор юзера
+     * @return {@link List}<{@link ShowMessageDto}>
+     * @throws NotFoundException в случае несуществования чата
+     * @throws BadRequestException в случае, когда пользователь не явлется участником чата
+     */
     @Transactional
     public List<ShowMessageDto> getMessagesList(UUID chatId, UUID targetUserId) {
         var chatEntity = chatRepository.findById(chatId)
@@ -184,6 +245,12 @@ public class MessageService {
         }
     }
 
+    /**
+     * Метод для преобразования списка объектов типа {@link MessageEntity} в список объектов {@link ShowMessageDto}
+     *
+     * @param list список объектов типа {@link MessageEntity}
+     * @return {@link List}<{@link ShowMessageDto}>
+     */
     private List<ShowMessageDto> mapEntitiesList(List<MessageEntity> list) {
         ArrayList<ShowMessageDto> result = new ArrayList<>();
         for (MessageEntity entity : list) {
@@ -193,6 +260,13 @@ public class MessageService {
         return result;
     }
 
+    /**
+     * Метод для получения сообщений по тексту в порядке убывания по дате последнего сообщения
+     *
+     * @param findMessageDto ДТО ({@link FindMessageDto}) с фильтрами для поиска сообщений
+     * @param targetUserId идентификатор пользователя
+     * @return {@link List}<{@link OutputMessageDto}>
+     */
     @Transactional
     public List<OutputMessageDto> getMessagesByText(FindMessageDto findMessageDto, UUID targetUserId) {
         List<ChatUserEntity> chatsList = chatUserRepository.findAllByUserId(targetUserId);
@@ -216,6 +290,13 @@ public class MessageService {
         return resultList;
     }
 
+    /**
+     * Метод для получения имени чата/диалога
+     *
+     * @param entity Entity сообщения ({@link MessageEntity})
+     * @param targetUserId идентификатор пользователя
+     * @return имя чата
+     */
     private String getChatName(MessageEntity entity, UUID targetUserId) {
         var chatName = entity.getChatEntity().getChatName();
         if (entity.getChatEntity().getIsDialog()) {
@@ -230,6 +311,13 @@ public class MessageService {
         return chatName;
     }
 
+    /**
+     * Метод для проверки, содержится ли в списке объектов чат-юзера идентификатор чата
+     *
+     * @param list {@link List}<{@link ChatUserEntity}> список
+     * @param chatId идентиикатор чата
+     * @return {@link Boolean}
+     */
     private Boolean ifListContainsId(List<ChatUserEntity> list, UUID chatId) {
         for (ChatUserEntity item : list) {
             if (item.getChatEntity().getId().equals(chatId)) {
@@ -240,7 +328,7 @@ public class MessageService {
     }
 
     /**
-     * Метод для отслания уведомления
+     * Метод для отслания уведомления через {@link StreamBridge}
      *
      * @param dto ДТО для создания уведомления
      */

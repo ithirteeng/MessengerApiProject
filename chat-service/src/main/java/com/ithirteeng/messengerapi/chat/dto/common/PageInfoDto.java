@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 
 /**
- * DTO для установки данных для пагинации
+ * ДТО для установки данных для пагинации
  */
 @AllArgsConstructor
 @NoArgsConstructor

@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Контроллер для чатов
+ */
 @RestController
 @RequestMapping("/api/chat/message")
 @RequiredArgsConstructor

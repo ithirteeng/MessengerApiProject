@@ -8,6 +8,9 @@ import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ДТО для создания чата
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

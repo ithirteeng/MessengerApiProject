@@ -7,6 +7,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ДТО для отправки сообщения в чат
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

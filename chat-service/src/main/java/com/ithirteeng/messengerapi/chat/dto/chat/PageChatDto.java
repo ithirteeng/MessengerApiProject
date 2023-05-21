@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * ДТО для показа чата в запросе с пагинацией
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

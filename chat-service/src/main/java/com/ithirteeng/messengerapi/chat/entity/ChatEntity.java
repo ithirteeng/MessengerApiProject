@@ -8,6 +8,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entity чата
+ */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

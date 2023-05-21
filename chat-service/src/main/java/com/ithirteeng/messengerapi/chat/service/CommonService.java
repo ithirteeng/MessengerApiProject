@@ -12,6 +12,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
+/**
+ * Сервис для отправки интеграционных запросов
+ */
 @Service
 @RequiredArgsConstructor
 public class CommonService {

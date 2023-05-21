@@ -7,9 +7,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Сервис для работы с пагинацией
+ */
 @Service
 @RequiredArgsConstructor
 public class PaginationHelperService {
+    /**
+     * Метод для получения корректного списка в зависимости от параметров пагинации
+     *
+     * @param list общий список
+     * @param infoDto ДТО для информации с пагинацией
+     * @return корректны список в зависимости от параметров пагинации
+     * @param <T> Тип данных списка
+     */
     public static <T> List<T> getCorrectPageList(List<T> list, PageInfoDto infoDto) {
         Integer totalPages = getTotalPagesCount(list, infoDto);
         if (infoDto.getPageNumber() >= totalPages) {
@@ -28,6 +39,14 @@ public class PaginationHelperService {
         }
     }
 
+    /**
+     * Метод для получения общего количества страниц в зависимости от параметров пагинации
+     *
+     * @param list список
+     * @param infoDto ДТО для информации с пагинацией
+     * @return количество страниц
+     * @param <T> Тип данных списка
+     */
     public static <T> Integer getTotalPagesCount(List<T> list, PageInfoDto infoDto) {
         if (list.size() == 0) {
             return 1;

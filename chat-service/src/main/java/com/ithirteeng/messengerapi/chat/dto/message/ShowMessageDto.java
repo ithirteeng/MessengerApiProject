@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * ДТО для показа сообщения
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
