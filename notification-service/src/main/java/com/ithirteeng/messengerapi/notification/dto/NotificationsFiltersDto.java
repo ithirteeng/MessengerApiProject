@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class NotificationsFiltersDto {
 
-    private PeriodDto periodFilter;
+    private DatePeriodDto periodFilter;
 
     private String textFilter;
 

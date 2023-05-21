@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PaginationAndFiltersDto {
+public class PageFiltersDto {
 
     private PageInfoDto pageInfo;
 
