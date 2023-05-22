@@ -22,11 +22,24 @@ public class IntegrationController {
 
     private final UserRepository userRepository;
 
+    /**
+     * Метод для проверки на существование пользователя по его идентификатору
+     *
+     * @param userId идентификатор пользователя
+     * @return {@link Boolean}
+     */
     @GetMapping("/users/check/{id}")
     public Boolean checkUserExisingById(@PathVariable("id") UUID userId) {
         return userRepository.existsById(userId);
     }
 
+
+    /**
+     * Метод для получения данных пользователя по его идентификатору
+     *
+     * @param userId идентификатор пользователя
+     * @return {@link UserDto}
+     */
     @GetMapping("/users/data/{id}")
     public UserDto getUserById(@PathVariable("id") UUID userId) {
         var entity = userRepository.findById(userId)

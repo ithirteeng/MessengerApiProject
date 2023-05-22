@@ -35,6 +35,12 @@ public class UserController {
 
     private final StreamBridge streamBridge;
 
+    /**
+     * Метод для регистрации пользователя
+     *
+     * @param registrationDto ДТО ({@link RegistrationDto}) для регистрации пользователя
+     * @return {@link ResponseEntity}<{@link UserDto}>
+     */
     @PostMapping("/registration")
     public ResponseEntity<UserDto> registerUser(@Validated @RequestBody RegistrationDto registrationDto) {
         var body = userService.postRegistration(registrationDto);
@@ -43,6 +49,12 @@ public class UserController {
                 .body(body);
     }
 
+    /**
+     * Метод для входа пользователя
+     *
+     * @param loginDto ДТО ({@link LoginDto}) для логина пользователя
+     * @return {@link ResponseEntity}<{@link UserDto}>
+     */
     @PostMapping("/login")
     public ResponseEntity<UserDto> loginUser(@Validated @RequestBody LoginDto loginDto) {
         var body = userService.postLogin(loginDto);
@@ -68,18 +80,38 @@ public class UserController {
         streamBridge.send("notificationEvent-out-0", dto);
     }
 
+    /**
+     * Метод для получения данных профиля пользователя по данным
+     *
+     * @param dto            ДТО ({@link GetProfileDto}) для получения данных профиля
+     * @param authentication {@link Authentication}
+     * @return {@link UserDto}
+     */
     @GetMapping("/profile")
     public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return userService.getUserData(dto.getLogin(), userData.getId());
     }
 
+    /**
+     * Метод для получения данных профиля пользователя
+     *
+     * @param authentication {@link Authentication}
+     * @return {@link UserDto}
+     */
     @GetMapping("/me")
     public UserDto getUserData(Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
         return UserMapper.entityToUserDto(userService.findUserEntityById(userData.getId()));
     }
 
+    /**
+     * Методя для изменения данных пользователя
+     *
+     * @param updateProfileDto ДТО ({@link UpdateProfileDto}) для изменения данных поьзователя
+     * @param authentication   {@link Authentication}
+     * @return {@link UserDto}
+     */
     @PutMapping("/profile/change")
     public UserDto changeProfileData(
             @Validated @RequestBody UpdateProfileDto updateProfileDto,
@@ -91,6 +123,12 @@ public class UserController {
 
     }
 
+    /**
+     * Метод для получения данных о пользователях по страницам, опираясь на параметры пагинации
+     *
+     * @param sortingDto ДТО с параметрами для пагинации
+     * @return {@link OutputPageDto}
+     */
     @PostMapping("/list")
     public OutputPageDto getUsersList(@Validated @RequestBody SortingDto sortingDto) {
         return PageMapper.pageToOutputPageDto(userService.getUsersList(sortingDto));
