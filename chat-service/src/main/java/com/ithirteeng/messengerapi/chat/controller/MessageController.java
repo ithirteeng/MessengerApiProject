@@ -20,6 +20,13 @@ import java.util.UUID;
 public class MessageController {
     private final MessageService messageService;
 
+    /**
+     * Метод для отправки сообщения в диалог
+     *
+     * @param id идентификатор юзера
+     * @param sendDialogueMessageDto ДТО ({@link SendDialogueMessageDto}) для отправки сообщения
+     * @param authentication {@link Authentication}
+     */
     @PostMapping("/send/{userId}")
     public void sendMessage(@PathVariable("userId") UUID id, @Validated @RequestBody SendDialogueMessageDto sendDialogueMessageDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
@@ -27,6 +34,12 @@ public class MessageController {
         messageService.sendMessageInDialogue(sendDialogueMessageDto, userData.getId());
     }
 
+    /**
+     * Метод для отправки сообщения в чат
+     *
+     * @param sendChatMessageDto ДТО ({@link SendChatMessageDto}) для отправки сообщения в чат
+     * @param authentication {@link Authentication}
+     */
     @PostMapping("/send")
     public void sendMessage(@Validated @RequestBody SendChatMessageDto sendChatMessageDto, Authentication authentication) {
         var userData = (JwtUserDetails) authentication.getPrincipal();
