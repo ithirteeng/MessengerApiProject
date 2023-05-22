@@ -9,12 +9,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Контроллер для работы с файлами со стороны клиента
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/file")
 public class MinioController {
     private final MinioFileService minioFileService;
 
+    /**
+     * Метод для загрузки файла
+     *
+     * @param file файл в формате {@link MultipartFile}
+     * @return {@link FileDataDto} - ДТО с данными для файла
+     */
     @SneakyThrows
     @PostMapping("/upload")
     public FileDataDto upload(@RequestParam("file") MultipartFile file) {
@@ -24,6 +33,12 @@ public class MinioController {
                 .build();
     }
 
+    /**
+     * Метод для загрузки бинарного файла
+     *
+     * @param id идентификатор файла
+     * @return {@link ResponseEntity} с хэдерами для скачивания
+     */
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadBinary(@PathVariable("id") String id) {
         var content = minioFileService.downloadFile(id);
@@ -33,6 +48,13 @@ public class MinioController {
                 .body(content);
     }
 
+    /**
+     * Метод для скачивания файла с его названием (если оно корректноеЖ filename.extension, то скачает и откроет нормально)
+     *
+     * @param id идентификатор файла
+     * @param fileName имя файла
+     * @return {@link ResponseEntity} с хэдерами для скачивания
+     */
     @GetMapping("/download/{id}/{file}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable("id") String id, @PathVariable("file") String fileName) {
         var content = minioFileService.downloadFile(id);

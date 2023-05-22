@@ -7,6 +7,9 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+/**
+ * Класс-конфиг для парсинга реквизитов минио из application.yml
+ */
 @Getter
 @Setter
 @ToString
@@ -18,6 +21,11 @@ public class MinioConfig {
     private String secretKey;
     private String bucket;
 
+    /**
+     * Метод для получения {@link MinioClient}
+     *
+     * @return {@link MinioClient}
+     */
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()

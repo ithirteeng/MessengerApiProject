@@ -11,10 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
+/**
+ * Сервис для работы с файлами
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,11 +26,13 @@ public class MinioFileService {
 
     private final MinioConfig minioConfig;
 
-    @PostConstruct
-    public void init() {
-        log.info("Minio configs: {}", minioConfig);
-    }
-
+    /**
+     * Метод для загрузки файла
+     *
+     * @param content сам файл в виде массива байтов
+     * @return идентификатор файла в minio
+     * @throws FileException в случае возникновения каких-либо ошибок при загрузке
+     */
     public String uploadFile(byte[] content) {
         try {
             var id = UUID.randomUUID().toString();
@@ -43,6 +47,13 @@ public class MinioFileService {
         }
     }
 
+    /**
+     * Метод для скачивания файла по его идентификатору в minio
+     *
+     * @param id идентификатор файла
+     * @return массив байтов
+     * @throws FileException в случае каких-либо ошибок при скачивании
+     */
     public byte[] downloadFile(String id) {
         var args = GetObjectArgs.builder()
                 .bucket(minioConfig.getBucket())
@@ -55,6 +66,13 @@ public class MinioFileService {
         }
     }
 
+    /**
+     * Метод для проверки на существование файла в хранилище
+     *
+     * @param id идентификатор файла
+     * @return {@link Boolean}
+     * @throws FileException в случае возникновения каких-либо ошибок при проверке
+     */
     public Boolean checkIfFileExists(String id) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
