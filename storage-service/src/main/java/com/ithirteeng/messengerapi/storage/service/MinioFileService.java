@@ -5,6 +5,8 @@ import com.ithirteeng.messengerapi.storage.utils.MinioConfig;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.StatObjectArgs;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,19 @@ public class MinioFileService {
                 .build();
         try (var in = minioClient.getObject(args)) {
             return in.readAllBytes();
+        } catch (Exception e) {
+            throw new FileException("File Download Error ID: " + id, e);
+        }
+    }
+
+    public Boolean checkIfFileExists(String id) {
+        try {
+            minioClient.statObject(StatObjectArgs.builder()
+                    .bucket(minioConfig.getBucket())
+                    .object(id).build());
+            return true;
+        } catch (ErrorResponseException e) {
+            return false;
         } catch (Exception e) {
             throw new FileException("File Download Error ID: " + id, e);
         }

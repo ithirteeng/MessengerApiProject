@@ -1,5 +1,6 @@
 package com.ithirteeng.messengerapi.storage.controller;
 
+import com.ithirteeng.messengerapi.common.model.FileDataDto;
 import com.ithirteeng.messengerapi.storage.service.MinioFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -16,16 +17,29 @@ public class MinioController {
 
     @SneakyThrows
     @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file) {
-        return minioFileService.uploadFile(file.getBytes()) + " " + file.getOriginalFilename();
+    public FileDataDto upload(@RequestParam("file") MultipartFile file) {
+        return FileDataDto.builder()
+                .fileId(minioFileService.uploadFile(file.getBytes()))
+                .fileName(file.getOriginalFilename())
+                .build();
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadBinary(@PathVariable("id") String id) {
+        var content = minioFileService.downloadFile(id);
+        return ResponseEntity.ok()
+                .header("Content-Disposition")
+                .contentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .body(content);
     }
 
     @GetMapping("/download/{id}/{file}")
-    public ResponseEntity<byte[]> download(@PathVariable("id") String id, @PathVariable("file") String fileName) {
+    public ResponseEntity<byte[]> downloadFile(@PathVariable("id") String id, @PathVariable("file") String fileName) {
         var content = minioFileService.downloadFile(id);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "filename=" + fileName)
                 .contentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE))
                 .body(content);
     }
+
 }
