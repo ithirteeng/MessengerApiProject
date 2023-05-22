@@ -1,12 +1,14 @@
 package com.ithirteeng.messengerapi.storage.service;
 
 import com.ithirteeng.messengerapi.common.exception.FileException;
+import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.FileDataDto;
+import com.ithirteeng.messengerapi.storage.entity.FilesEntity;
+import com.ithirteeng.messengerapi.storage.repository.FilesRepository;
 import com.ithirteeng.messengerapi.storage.utils.MinioConfig;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.StatObjectArgs;
-import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class MinioFileService {
 
     private final MinioConfig minioConfig;
 
+    private final FilesRepository filesRepository;
+
     /**
      * Метод для загрузки файла
      *
@@ -33,7 +37,7 @@ public class MinioFileService {
      * @return идентификатор файла в minio
      * @throws FileException в случае возникновения каких-либо ошибок при загрузке
      */
-    public String uploadFile(byte[] content) {
+    public FileDataDto uploadFile(byte[] content, String fileName) {
         try {
             var id = UUID.randomUUID().toString();
             minioClient.putObject(PutObjectArgs.builder()
@@ -41,10 +45,31 @@ public class MinioFileService {
                     .object(id)
                     .stream(new ByteArrayInputStream(content), content.length, -1)
                     .build());
-            return id;
+            filesRepository.save(createEntity(content, fileName, id));
+            return FileDataDto.builder()
+                    .fileName(fileName)
+                    .fileId(id)
+                    .fileSize(content.length)
+                    .build();
         } catch (Exception e) {
             throw new FileException("File Upload Error", e);
         }
+    }
+
+    /**
+     * Метод для создания объекта {@link FilesEntity}
+     *
+     * @param content  массив байтов файла
+     * @param fileName имя файла
+     * @param id       идентификатор файла
+     * @return {@link FilesEntity}
+     */
+    private FilesEntity createEntity(byte[] content, String fileName, String id) {
+        return FilesEntity.builder()
+                .id(id)
+                .fileSize(content.length)
+                .name(fileName)
+                .build();
     }
 
     /**
@@ -74,16 +99,24 @@ public class MinioFileService {
      * @throws FileException в случае возникновения каких-либо ошибок при проверке
      */
     public Boolean checkIfFileExists(String id) {
-        try {
-            minioClient.statObject(StatObjectArgs.builder()
-                    .bucket(minioConfig.getBucket())
-                    .object(id).build());
-            return true;
-        } catch (ErrorResponseException e) {
-            return false;
-        } catch (Exception e) {
-            throw new FileException("File Download Error ID: " + id, e);
-        }
+        return filesRepository.existsById(id);
     }
+
+    /**
+     * Метод для получения данных о файле по его идентификатору
+     *
+     * @param id идентификатор файла в хранилище
+     * @return {@link FileDataDto}
+     */
+    public FileDataDto getFileDataById(String id) {
+        var entity = filesRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Такого файла не существует"));
+        return FileDataDto.builder()
+                .fileSize(entity.getFileSize())
+                .fileName(entity.getName())
+                .fileId(entity.getId())
+                .build();
+    }
+
 
 }

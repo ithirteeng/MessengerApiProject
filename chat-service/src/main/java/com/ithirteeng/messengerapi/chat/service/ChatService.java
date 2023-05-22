@@ -39,7 +39,7 @@ public class ChatService {
      * Метод для добавления пользователя в чат
      *
      * @param chatEntity чат типа {@link ChatEntity}
-     * @param userId идентификатор пользователя
+     * @param userId     идентификатор пользователя
      */
     @Transactional
     public void addChatToUser(ChatEntity chatEntity, UUID userId) {
@@ -59,7 +59,7 @@ public class ChatService {
      * Метод для создания чата
      *
      * @param createChatDto ДТО для создания чата ({@link CreateChatDto})
-     * @param targetUserId идентификатор пользователя
+     * @param targetUserId  идентификатор пользователя
      * @return {@link ChatDto}
      * @throws BadRequestException в случае, если при созданиии было указано меньше 3 пользователей
      */
@@ -67,7 +67,7 @@ public class ChatService {
     public ChatDto createChat(CreateChatDto createChatDto, UUID targetUserId) {
         var entity = ChatMapper.createChatDtoToChatEntity(createChatDto, targetUserId);
 
-        if (entity.getChatUserEntitiesList().size() <= 2) {
+        if (createChatDto.getUsersIdsList().size() < 2) {
             throw new BadRequestException("В чате должно быть больше двух учасников!");
         }
 
@@ -82,7 +82,7 @@ public class ChatService {
      * Метод для обновления чата
      *
      * @param updateChatDto ДТО для обновления чата ({@link UpdateChatDto})
-     * @param targetUserId идентификатор пользователя
+     * @param targetUserId  идентификатор пользователя
      * @return {@link ChatDto}
      * @throws NotFoundException при условии несуществования чата
      */
@@ -105,7 +105,7 @@ public class ChatService {
      *
      * @param usersIdsList список идентификаторов пользователей
      * @param targetUserId идентификатор целевого пользователя
-     * @param chatEntity чат типа {@link ChatEntity}
+     * @param chatEntity   чат типа {@link ChatEntity}
      * @throws BadRequestException в случае, когда целевой пользователь пытается добавить сам себя в создаваемый им чат
      */
     private void addUsersToChat(List<UUID> usersIdsList, UUID targetUserId, ChatEntity chatEntity) {
@@ -125,11 +125,11 @@ public class ChatService {
     /**
      * Получение информации о чате по его идентификатору
      *
-     * @param chatId идентификатор чата
+     * @param chatId       идентификатор чата
      * @param targetUserId идентификатор пользователя
      * @return {@link ShowDialogueDto} или {@link ShowChatDto} в зависимости от типа чата
      * @throws BadRequestException в случае, когда пользователь не является учасником чата
-     * @throws NotFoundException в случае несуществования чата
+     * @throws NotFoundException   в случае несуществования чата
      */
     @Transactional(readOnly = true)
     public Object getChatInfoById(UUID chatId, UUID targetUserId) {
@@ -156,7 +156,7 @@ public class ChatService {
     /**
      * Метод для получения чатов с пагинацией
      *
-     * @param inputDto ДТО с информацией по пагинации
+     * @param inputDto     ДТО с информацией по пагинации
      * @param targetUserId идентификатор пользователя
      * @return {@link OutputPageChatDto}
      */

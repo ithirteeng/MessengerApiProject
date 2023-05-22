@@ -3,6 +3,7 @@ package com.ithirteeng.messengerapi.chat.service;
 import com.ithirteeng.messengerapi.common.consts.RequestsConstants;
 import com.ithirteeng.messengerapi.common.exception.BadRequestException;
 import com.ithirteeng.messengerapi.common.exception.NotFoundException;
+import com.ithirteeng.messengerapi.common.model.FileDataDto;
 import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.props.SecurityProps;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +75,7 @@ public class CommonService {
      * Метод для проверки, являются ли пользователи друзьями
      *
      * @param externalUserId Id внешнего пользователя
-     * @param targetUserId Id целевого пользователя
+     * @param targetUserId   Id целевого пользователя
      */
     public void checkIfUsersAreFriends(UUID externalUserId, UUID targetUserId) {
         RestTemplate restTemplate = new RestTemplate();
@@ -100,6 +101,40 @@ public class CommonService {
 
         ResponseEntity<UserDto> responseEntity = restTemplate.exchange(
                 url, HttpMethod.GET, setupRequestHttpEntity(), UserDto.class
+        );
+
+        return responseEntity.getBody();
+    }
+
+    /**
+     * Метод проверки на существование файла в хранилище
+     *
+     * @param fileStorageId идентификатор файла в хранилище
+     * @return {@link Boolean}
+     */
+    public Boolean checkIfFileExists(String fileStorageId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1311/integration/file/check/" + fileStorageId;
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), Boolean.class
+        );
+
+        return responseEntity.getBody();
+    }
+
+    /**
+     * Метод для получения данных о файле по идентификатору
+     *
+     * @param fileStorageId идентификатор файла в хранилище
+     * @return {@link com.ithirteeng.messengerapi.common.model.FileDataDto}
+     */
+    public FileDataDto getFileData(String fileStorageId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:1311/integration/file/" + fileStorageId;
+
+        ResponseEntity<FileDataDto> responseEntity = restTemplate.exchange(
+                url, HttpMethod.GET, setupRequestHttpEntity(), FileDataDto.class
         );
 
         return responseEntity.getBody();

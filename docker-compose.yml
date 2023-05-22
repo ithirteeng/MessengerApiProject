@@ -26,6 +26,19 @@ services:
     volumes:
       - "./postgres_data/notification:/var/lib/postgresql/data"
 
+  files_db:
+    image: "postgres"
+    restart: unless-stopped
+    container_name: "files_service"
+    ports:
+      - "1394:5432"
+    environment:
+      POSTGRES_USER: "files_user"
+      POSTGRES_PASSWORD: "files_password"
+      POSTGRES_DB: "files_db"
+    volumes:
+      - "./postgres_data/files:/var/lib/postgresql/data"
+
   friends_db:
     image: "postgres"
     restart: unless-stopped

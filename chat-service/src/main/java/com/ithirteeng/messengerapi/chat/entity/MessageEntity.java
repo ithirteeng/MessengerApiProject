@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,5 +39,9 @@ public class MessageEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "chatId")
     private ChatEntity chatEntity;
+
+    @OneToMany(mappedBy = "messageEntity")
+    private List<FileEntity> files;
+
 }
 

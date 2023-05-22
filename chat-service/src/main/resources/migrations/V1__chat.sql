@@ -42,10 +42,12 @@ create table public.file_entity
     id         uuid not null
         primary key,
     file_name  varchar(255),
+    file_size  bigint,
     storage_id uuid,
     message_id uuid
         constraint fk_message
             references public.message_entity
 );
+
 
 

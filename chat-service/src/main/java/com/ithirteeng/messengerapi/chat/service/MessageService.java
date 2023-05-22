@@ -44,6 +44,8 @@ public class MessageService {
 
     private final StreamBridge streamBridge;
 
+    private final FileService fileService;
+
     /**
      * Метод для отправки сообщения в диалог, если сообщение - первое, то еще и создается диалог
      *
@@ -63,8 +65,13 @@ public class MessageService {
 
         var entity = createDialogue(sendDialogueMessageDto, targetUserId);
 
+        var filesList = sendDialogueMessageDto.getFilesIdsList();
+        checkFilesExisting(filesList);
+
         var messageEntity = MessageMapper.sendDialogueMessageDtoToEntity(sendDialogueMessageDto, entity, targetUserId);
         messageRepository.save(messageEntity);
+
+        fileService.attachFilesToMessage(filesList, messageEntity.getId());
 
         entity.setLastMessageId(messageEntity.getId());
         entity.setLastMessageDate(messageEntity.getCreationDate());
@@ -189,8 +196,8 @@ public class MessageService {
      * Метод для отправки сообщения в чат
      *
      * @param sendChatMessageDto ДТО ({@link SendChatMessageDto}) для отправки сообщения в чат
-     * @param targetUserId идентификатор целевого пользователя
-     * @throws NotFoundException в случае несуществования чата
+     * @param targetUserId       идентификатор целевого пользователя
+     * @throws NotFoundException   в случае несуществования чата
      * @throws BadRequestException в случае когда пользователь не является участником чата
      */
     @Transactional
@@ -201,12 +208,18 @@ public class MessageService {
         if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(targetUserId, chatEntity)) {
             throw new BadRequestException("Пользователь не является участником чата!");
         } else {
+
+            var filesList = sendChatMessageDto.getFilesIdsList();
+            checkFilesExisting(filesList);
+
             var messageEntity = MessageMapper.sendChatMessageDtoToEntity(sendChatMessageDto, chatEntity, targetUserId);
             messageRepository.save(messageEntity);
 
             chatEntity.setLastMessageId(messageEntity.getId());
             chatEntity.setLastMessageDate(messageEntity.getCreationDate());
             chatEntity.setLasMessageAuthorId(messageEntity.getAuthorId());
+
+            fileService.attachFilesToMessage(filesList, messageEntity.getId());
 
             chatRepository.save(chatEntity);
 
@@ -226,10 +239,10 @@ public class MessageService {
     /**
      * Метод для получения списка сообщений
      *
-     * @param chatId идентификатор чата
+     * @param chatId       идентификатор чата
      * @param targetUserId идентификатор юзера
      * @return {@link List}<{@link ShowMessageDto}>
-     * @throws NotFoundException в случае несуществования чата
+     * @throws NotFoundException   в случае несуществования чата
      * @throws BadRequestException в случае, когда пользователь не явлется участником чата
      */
     @Transactional
@@ -264,7 +277,7 @@ public class MessageService {
      * Метод для получения сообщений по тексту в порядке убывания по дате последнего сообщения
      *
      * @param findMessageDto ДТО ({@link FindMessageDto}) с фильтрами для поиска сообщений
-     * @param targetUserId идентификатор пользователя
+     * @param targetUserId   идентификатор пользователя
      * @return {@link List}<{@link OutputMessageDto}>
      */
     @Transactional
@@ -293,7 +306,7 @@ public class MessageService {
     /**
      * Метод для получения имени чата/диалога
      *
-     * @param entity Entity сообщения ({@link MessageEntity})
+     * @param entity       Entity сообщения ({@link MessageEntity})
      * @param targetUserId идентификатор пользователя
      * @return имя чата
      */
@@ -314,7 +327,7 @@ public class MessageService {
     /**
      * Метод для проверки, содержится ли в списке объектов чат-юзера идентификатор чата
      *
-     * @param list {@link List}<{@link ChatUserEntity}> список
+     * @param list   {@link List}<{@link ChatUserEntity}> список
      * @param chatId идентиикатор чата
      * @return {@link Boolean}
      */
@@ -325,6 +338,21 @@ public class MessageService {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Метод для проверки файлов на существование
+     *
+     * @param fileIdsList список идентифивторов файлов
+     * @throws NotFoundException в случае, если файла нет в хранилище
+     */
+    private void checkFilesExisting(List<UUID> fileIdsList) {
+        for (UUID id : fileIdsList) {
+            if (!commonService.checkIfFileExists(id.toString())) {
+                throw new NotFoundException("Файла с таким id: " + id + " не существует");
+            }
+        }
     }
 
     /**

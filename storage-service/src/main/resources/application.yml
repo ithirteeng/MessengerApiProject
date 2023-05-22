@@ -5,6 +5,19 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  flyway:
+    locations: classpath:migrations
+    url: jdbc:postgresql://localhost:1394/files_db
+    user: files_user
+    password: files_password
+  datasource:
+    url: jdbc:postgresql://localhost:1394/files_db
+    username: files_user
+    password: files_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
 
 minio:
   access-key: foGQ56VUDXn63a0JpNFj

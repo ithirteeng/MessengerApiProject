@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.UUID;
 
 /**
- * Entity приложения
+ * Entity файла (приложения к сообщению)
  */
 @Entity
 @AllArgsConstructor
@@ -21,8 +21,8 @@ public class FileEntity {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "messageId", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "messageId")
     private MessageEntity messageEntity;
 
     @Column(name = "storageId")
@@ -30,4 +30,7 @@ public class FileEntity {
 
     @Column(name = "fileName")
     private String fileName;
+
+    @Column(name = "fileSize")
+    private Long fileSize;
 }

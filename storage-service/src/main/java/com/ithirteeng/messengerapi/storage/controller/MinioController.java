@@ -27,10 +27,7 @@ public class MinioController {
     @SneakyThrows
     @PostMapping("/upload")
     public FileDataDto upload(@RequestParam("file") MultipartFile file) {
-        return FileDataDto.builder()
-                .fileId(minioFileService.uploadFile(file.getBytes()))
-                .fileName(file.getOriginalFilename())
-                .build();
+        return minioFileService.uploadFile(file.getBytes(), file.getOriginalFilename());
     }
 
     /**
@@ -39,7 +36,7 @@ public class MinioController {
      * @param id идентификатор файла
      * @return {@link ResponseEntity} с хэдерами для скачивания
      */
-    @GetMapping("/download/{id}")
+    @GetMapping("/download/binary/{id}")
     public ResponseEntity<byte[]> downloadBinary(@PathVariable("id") String id) {
         var content = minioFileService.downloadFile(id);
         return ResponseEntity.ok()
@@ -51,7 +48,7 @@ public class MinioController {
     /**
      * Метод для скачивания файла с его названием (если оно корректноеЖ filename.extension, то скачает и откроет нормально)
      *
-     * @param id идентификатор файла
+     * @param id       идентификатор файла
      * @param fileName имя файла
      * @return {@link ResponseEntity} с хэдерами для скачивания
      */
@@ -60,6 +57,22 @@ public class MinioController {
         var content = minioFileService.downloadFile(id);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "filename=" + fileName)
+                .contentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .body(content);
+    }
+
+    /**
+     * Метод для загрузки файла c его дефолтным именем
+     *
+     * @param id идентификатор файла
+     * @return {@link ResponseEntity} с хэдерами для скачивания
+     */
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadDefault(@PathVariable("id") String id) {
+        var data = minioFileService.getFileDataById(id);
+        var content = minioFileService.downloadFile(id);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "filename=" + data.getFileName())
                 .contentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE))
                 .body(content);
     }
