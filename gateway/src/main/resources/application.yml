@@ -24,5 +24,8 @@ spring:
           uri: http://localhost:1300/
           predicates:
             - Path=/api/notifications/**
-
+        - id: storage-service
+          uri: http://localhost:1311/
+          predicates:
+            - Path=/api/file/**
 

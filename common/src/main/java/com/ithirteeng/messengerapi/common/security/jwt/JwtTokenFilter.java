@@ -48,7 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             var jwtToken = "";
             try {
                 jwtToken = bearerToken.substring(7);
-            } catch (Exception e) {
+            } catch (StringIndexOutOfBoundsException e) {
                 logError(request, e);
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }
@@ -59,7 +59,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 filterChain.doFilter(request, response);
-            } catch (Exception e) {
+            } catch (UnauthorizedException e) {
                 logError(request, e);
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }
