@@ -5,6 +5,8 @@ import com.ithirteeng.messengerapi.chat.entity.FileEntity;
 import com.ithirteeng.messengerapi.chat.entity.MessageEntity;
 import com.ithirteeng.messengerapi.common.model.FileDataDto;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class FileMapper {
@@ -19,11 +21,20 @@ public class FileMapper {
 
     public static ShowFileDto showFileDtoFromEntity(FileEntity entity) {
         return ShowFileDto.builder()
-                .id(entity.getId())
                 .storageFileId(entity.getStorageId().toString())
                 .name(entity.getFileName())
                 .fileSize(entity.getFileSize().toString())
                 .build();
+    }
+
+    public static List<ShowFileDto> mapEntitiesListToDtosList(List<FileEntity> list) {
+        var resultList = new ArrayList<ShowFileDto>();
+
+        for (FileEntity entity: list) {
+            resultList.add(showFileDtoFromEntity(entity));
+        }
+
+        return resultList;
     }
 
 

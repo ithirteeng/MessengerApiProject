@@ -253,7 +253,7 @@ public class MessageService {
         if (!chatUserRepository.existsChatUserByUserIdAndChatEntity(targetUserId, chatEntity)) {
             throw new BadRequestException("Пользователь не является участником чата!");
         } else {
-            var list = messageRepository.findAllByChatEntity(chatEntity);
+            var list = messageRepository.findAllByChatEntityOrderByCreationDateDesc(chatEntity);
             return mapEntitiesList(list);
         }
     }

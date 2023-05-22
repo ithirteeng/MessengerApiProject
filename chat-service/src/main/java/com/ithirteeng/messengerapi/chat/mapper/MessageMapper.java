@@ -18,8 +18,8 @@ public class MessageMapper {
      * Метод для преобразвания объекта типа {@link SendDialogueMessageDto} в объект типа {@link MessageEntity}
      *
      * @param sendDialogueMessageDto объект типа {@link SendDialogueMessageDto}
-     * @param chatEntity объект типа {@link ChatEntity}
-     * @param targetUserId идентификатор пользователя
+     * @param chatEntity             объект типа {@link ChatEntity}
+     * @param targetUserId           идентификатор пользователя
      * @return {@link MessageEntity}
      */
     public static MessageEntity sendDialogueMessageDtoToEntity(SendDialogueMessageDto sendDialogueMessageDto, ChatEntity chatEntity, UUID targetUserId) {
@@ -35,8 +35,8 @@ public class MessageMapper {
      * Метод для преобразвания объекта типа {@link SendChatMessageDto} в объект типа {@link MessageEntity}
      *
      * @param sendChatMessageDto объект типа {@link SendChatMessageDto}
-     * @param chatEntity объект типа {@link ChatEntity}
-     * @param targetUserId идентификатор пользователя
+     * @param chatEntity         объект типа {@link ChatEntity}
+     * @param targetUserId       идентификатор пользователя
      * @return {@link MessageEntity}
      */
     public static MessageEntity sendChatMessageDtoToEntity(SendChatMessageDto sendChatMessageDto, ChatEntity chatEntity, UUID targetUserId) {
@@ -52,8 +52,8 @@ public class MessageMapper {
      * Метод для преобразвания объекта типа {@link MessageEntity} в объект типа {@link ShowMessageDto}
      *
      * @param messageEntity объект типа {@link MessageEntity}
-     * @param userName имя пользователя
-     * @param userAvatar идентификатор аватарки пользователя
+     * @param userName      имя пользователя
+     * @param userAvatar    идентификатор аватарки пользователя
      * @return {@link ShowMessageDto}
      */
     public static ShowMessageDto entityToshowMessageDto(MessageEntity messageEntity, String userName, UUID userAvatar) {
@@ -63,6 +63,7 @@ public class MessageMapper {
                 .senderName(userName)
                 .sendingTime(messageEntity.getCreationDate())
                 .message(messageEntity.getMessageText())
+                .filesList(FileMapper.mapEntitiesListToDtosList(messageEntity.getFiles()))
                 .build();
     }
 
@@ -70,8 +71,8 @@ public class MessageMapper {
      * Метод для преобразвания объекта типа {@link MessageEntity} в объект типа {@link OutputMessageDto}
      *
      * @param messageEntity объект типа {@link MessageEntity}
-     * @param chatName имя чата
-     * @param fileName имя файла
+     * @param chatName      имя чата
+     * @param fileName      имя файла
      * @return {@link OutputMessageDto}
      */
     public static OutputMessageDto entityToOutputMessageDto(MessageEntity messageEntity, String chatName, String fileName) {

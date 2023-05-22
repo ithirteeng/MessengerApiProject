@@ -2,8 +2,6 @@ package com.ithirteeng.messengerapi.chat.dto.file;
 
 import lombok.*;
 
-import java.util.UUID;
-
 @Data
 @Getter
 @AllArgsConstructor
@@ -11,9 +9,6 @@ import java.util.UUID;
 @Builder
 @Setter
 public class ShowFileDto {
-
-    private UUID id;
-
     private String storageFileId;
 
     private String name;

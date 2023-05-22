@@ -19,7 +19,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, UUID> {
      * @param chatEntity чат типа {@link ChatEntity}
      * @return {@link List}<{@link MessageEntity}>
      */
-    List<MessageEntity> findAllByChatEntity(ChatEntity chatEntity);
+    List<MessageEntity> findAllByChatEntityOrderByCreationDateDesc(ChatEntity chatEntity);
 
     /**
      * Метод получения списков сообщений по wildcard фильтру текста онных

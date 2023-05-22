@@ -1,8 +1,10 @@
 package com.ithirteeng.messengerapi.chat.dto.message;
 
+import com.ithirteeng.messengerapi.chat.dto.file.ShowFileDto;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,4 +27,6 @@ public class ShowMessageDto {
     private String senderName;
 
     private UUID avatarId;
+
+    private List<ShowFileDto> filesList;
 }

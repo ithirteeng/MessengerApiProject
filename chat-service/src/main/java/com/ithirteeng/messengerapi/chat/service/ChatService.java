@@ -71,6 +71,12 @@ public class ChatService {
             throw new BadRequestException("В чате должно быть больше двух учасников!");
         }
 
+        if (createChatDto.getAvatarId() != null) {
+            if (commonService.checkIfFileExists(createChatDto.getAvatarId().toString())) {
+                throw new NotFoundException("Файла с таким id: " + createChatDto.getAvatarId() + " не существует");
+            }
+        }
+
         chatRepository.save(entity);
         addUsersToChat(createChatDto.getUsersIdsList(), targetUserId, entity);
 
