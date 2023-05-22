@@ -42,6 +42,8 @@ public class UserService {
 
     private final StreamBridge streamBridge;
 
+    private final CommonService commonService;
+
     /**
      * Метод для получения данных о пользователе по id
      *
@@ -100,6 +102,11 @@ public class UserService {
         if (repository.existsByLoginOrEmail(registrationDto.getLogin(), registrationDto.getEmail())) {
             throw new ConflictException("Такой пользователь уже существует!");
         } else {
+            if (registrationDto.getAvatarId() != null) {
+                if (!commonService.checkIfFileExists(registrationDto.getAvatarId().toString())) {
+                    throw new NotFoundException("Файла с таким id: " + registrationDto.getAvatarId() + " не существует");
+                }
+            }
             var entity = repository.save(UserMapper.registrationDtoToUserEntity(registrationDto));
             return UserMapper.entityToUserDto(entity);
         }

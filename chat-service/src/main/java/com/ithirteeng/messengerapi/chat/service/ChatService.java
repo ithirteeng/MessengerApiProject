@@ -72,7 +72,7 @@ public class ChatService {
         }
 
         if (createChatDto.getAvatarId() != null) {
-            if (commonService.checkIfFileExists(createChatDto.getAvatarId().toString())) {
+            if (!commonService.checkIfFileExists(createChatDto.getAvatarId().toString())) {
                 throw new NotFoundException("Файла с таким id: " + createChatDto.getAvatarId() + " не существует");
             }
         }
