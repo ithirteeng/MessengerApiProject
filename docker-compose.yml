@@ -62,3 +62,20 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "rmq-user"
       RABBITMQ_DEFAULT_PASS: "rmq-pass"
+
+  minio:
+    image: "bitnami/minio"
+    restart: unless-stopped
+    container_name: "minio"
+    environment:
+      MINIO_ROOT_USER: "minio_user"
+      MINIO_ROOT_PASSWORD: "minio_password"
+    volumes:
+      - "minio-data:/data"
+    ports:
+      - "1401:9000"
+      - "1402:9001"
+
+
+volumes:
+  minio-data:
