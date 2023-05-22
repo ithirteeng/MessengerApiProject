@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис для работы с уведомлениями
+ */
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
