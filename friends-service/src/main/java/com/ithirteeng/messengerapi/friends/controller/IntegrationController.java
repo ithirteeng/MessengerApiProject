@@ -21,11 +21,25 @@ public class IntegrationController {
 
     private final FriendsService friendsService;
 
+    /**
+     * Методя для проверки, находится ли юзер в ЧС
+     *
+     * @param externalUserId идентификатор внешнего польщователя
+     * @param targetUserId идентификатор целевого пользователя
+     * @return {@link Boolean}
+     */
     @GetMapping("/blacklist/{externalUserId}/{targetUserId}")
     public Boolean checkIfUserInBlackList(@PathVariable("externalUserId") UUID externalUserId, @PathVariable("targetUserId") UUID targetUserId) {
         return blackListService.checkIfUserInBlackList(targetUserId, externalUserId);
     }
 
+    /**
+     * Методя для проверки, находится ли юзер в списки друзей
+     *
+     * @param externalUserId идентификатор внешнего польщователя
+     * @param targetUserId идентификатор целевого пользователя
+     * @return {@link Boolean}
+     */
     @GetMapping("/friends/{externalUserId}/{targetUserId}")
     public Boolean checkIfUsersAreFriends(@PathVariable("externalUserId") UUID externalUserId, @PathVariable("targetUserId") UUID targetUserId) {
         return friendsService.checkIfUsersAreFriends(targetUserId, externalUserId);
