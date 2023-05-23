@@ -52,7 +52,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Метод для генерации JWT токена для логина
+     * Метод для генерации JWT токена для регистрации
      *
      * @param registrationDto ДТО для запросов с регистрацией
      * @return {@link String}
