@@ -18,7 +18,7 @@ public class CheckPaginationDetailsService {
      * @throws BadRequestException некорректный запрос
      */
     public void checkPageNumber(int pageNumber) {
-        if (pageNumber < 0) {
+        if (pageNumber <= 0) {
             throw new BadRequestException("Номер страницы должен быть больше 0");
         }
     }
@@ -32,18 +32,6 @@ public class CheckPaginationDetailsService {
     public void checkPageSize(int pageSize) {
         if (pageSize <= 0) {
             throw new BadRequestException("Размер страницы должен быть больше 0");
-        }
-    }
-
-    /**
-     * Метод для проверки на null направления сортировки
-     *
-     * @param direction направление сортировки
-     * @throws BadRequestException некорректный запрос
-     */
-    public void checkDirection(Sort.Direction direction) {
-        if (direction == null) {
-            throw new BadRequestException("Направление сортировки не должно быть null");
         }
     }
 
