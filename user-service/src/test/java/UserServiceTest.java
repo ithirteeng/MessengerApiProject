@@ -23,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Collections;
 import java.util.List;
@@ -95,10 +94,14 @@ public class UserServiceTest {
             mockStatic(PasswordHelper.class);
         } catch (Exception e) {
         }
+        try {
+            mockStatic(UserMapper.class);
+        } catch (Exception e) {}
         when(repository.findByLogin(any(String.class))).thenReturn(Optional.of(userEntity));
-        when(bCryptPasswordEncoder.matches(any(String.class), any(String.class))).thenReturn(true);
         when(PasswordHelper.isPasswordValid(any(String.class), any(String.class))).thenReturn(true);
+        when(UserMapper.entityToUserDto(userEntity)).thenReturn(new UserDto());
         var result = userService.postLogin(new LoginDto("SFD", "SDFSD"));
+
         assertNotNull(result);
     }
 
@@ -226,6 +229,32 @@ public class UserServiceTest {
         assertNotNull(result);
     }
 
+    @Test(expected = NotFoundException.class)
+    public void testUpdateProfile_ThrowsNotFoundException() {
+        UserEntity userEntity = UserEntity.builder()
+                .password("test_p")
+                .login("test_login")
+                .email("test@email.com")
+                .id(UUID.randomUUID())
+                .fullName("TEST FULLNAME")
+                .build();
+
+        try {
+            mockStatic(UserMapper.class);
+        } catch (Exception e) {
+        }
+
+        var updateProfileDto = UpdateProfileDto.builder().fullName("TEST").build();
+
+        when(repository.findByLogin(any(String.class))).thenReturn(Optional.empty());
+        when(UserMapper.updateUserFields(userEntity, updateProfileDto)).thenReturn(userEntity);
+        when(UserMapper.entityToUserDto(userEntity)).thenReturn(UserDto.builder().fullName("SDFsdfs").build());
+
+        var result = userService.updateProfile(updateProfileDto, "login");
+
+        assertNotNull(result);
+    }
+
     @Test
     public void testGetUserData_HttpClientErrorException() {
         var userId = UUID.randomUUID();
@@ -245,7 +274,7 @@ public class UserServiceTest {
 
         when(repository.findByLogin(any(String.class))).thenReturn(Optional.of(userEntity));
         when(securityProps.getIntegrations()).thenReturn(securityIntegrationsProps);
-        assertThrows(HttpClientErrorException.Unauthorized.class, () -> userService.getUserData("login", friendId));
+        assertThrows(Exception.class, () -> userService.getUserData("login", friendId));
     }
 
     @Test

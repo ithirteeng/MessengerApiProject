@@ -165,7 +165,7 @@ public class UserService {
         Pageable pageable = PageRequest.of(pageInfo.getPageNumber() - 1, pageInfo.getPageSize(), sort);
         Page<UserEntity> users = repository.findAll(example, pageable);
 
-        if (users.getTotalPages() <= pageInfo.getPageNumber() && users.getTotalPages() != 0) {
+        if (users.getTotalPages() <= pageInfo.getPageNumber() - 1 && users.getTotalPages() != 0) {
             throw new BadRequestException("Номер страницы не должен превышать общее число онных");
         }
         return users.map(UserMapper::entityToUserDto);
