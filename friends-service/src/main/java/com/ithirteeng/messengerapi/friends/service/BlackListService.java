@@ -214,14 +214,14 @@ public class BlackListService {
         var filtersInfo = sortingDto.getFilters();
         Example<BlockedUserEntity> example = setupBlocakedUserEntityExample(filtersInfo, targetUserId);
 
-        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber() - 1, pageInfo.getPageSize());
         Page<BlockedUserEntity> blockedUsersPage = blackListRepository.findAll(example, pageable);
 
         var nameFilter = filtersInfo.getFullName() == null ? "" : filtersInfo.getFullName();
         List<BlockedUserEntity> fullNameList = blackListRepository.findByFullNameLikeAndTargetUserId(nameFilter, targetUserId);
 
-        if (blockedUsersPage.getTotalPages() <= pageInfo.getPageNumber() && blockedUsersPage.getTotalPages() != 0) {
-            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        if (blockedUsersPage.getTotalPages() <= pageInfo.getPageNumber() - 1 && blockedUsersPage.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных");
         }
 
         return PageMapper.pageToOutputNotesPageDto(blockedUsersPage, fullNameList);
@@ -255,15 +255,15 @@ public class BlackListService {
     @Transactional(readOnly = true)
     public OutputNotesPageDto searchNotes(SearchDto searchDto, UUID targetUserId) {
         var pageInfo = searchDto.getPageInfo();
-        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber() - 1, pageInfo.getPageSize());
 
         Page<BlockedUserEntity> blocakedUsersPage = blackListRepository.findAllByTargetUserId(targetUserId, pageable);
         var nameFilter = searchDto.getFilterName() == null ? "" : searchDto.getFilterName();
 
         List<BlockedUserEntity> fullNameList = blackListRepository.findByFullNameLikeAndTargetUserId(nameFilter, targetUserId);
 
-        if (blocakedUsersPage.getTotalPages() <= pageInfo.getPageNumber() && blocakedUsersPage.getTotalPages() != 0) {
-            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        if (blocakedUsersPage.getTotalPages() <= pageInfo.getPageNumber() - 1 && blocakedUsersPage.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных");
         }
 
         return PageMapper.pageToOutputNotesPageDto(blocakedUsersPage, fullNameList);
