@@ -194,14 +194,14 @@ public class FriendsService {
         var filtersInfo = sortingDto.getFilters();
         Example<FriendEntity> example = setupFriendEntityExample(filtersInfo, targetUserId);
 
-        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber() - 1, pageInfo.getPageSize());
         Page<FriendEntity> friendsPage = friendsRepository.findAll(example, pageable);
 
         var nameFilter = filtersInfo.getFullName() == null ? "" : filtersInfo.getFullName();
         List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(nameFilter, targetUserId);
 
-        if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() && friendsPage.getTotalPages() != 0) {
-            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() - 1 && friendsPage.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных");
         }
 
         return PageMapper.pageToOutputPageDto(friendsPage, fullNameList);
@@ -235,14 +235,14 @@ public class FriendsService {
     @Transactional(readOnly = true)
     public OutputFriendsPageDto searchFriends(SearchDto searchDto, UUID targetUserId) {
         var pageInfo = searchDto.getPageInfo();
-        Pageable pageable = PageRequest.of(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        Pageable pageable = PageRequest.of(pageInfo.getPageNumber() - 1, pageInfo.getPageSize());
 
         Page<FriendEntity> friendsPage = friendsRepository.findAllByTargetUserId(targetUserId, pageable);
         var nameFilter = searchDto.getFilterName() == null ? "" : searchDto.getFilterName();
         List<FriendEntity> fullNameList = friendsRepository.findByFullNameLikeAndTargetUserId(nameFilter, targetUserId);
 
-        if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() && friendsPage.getTotalPages() != 0) {
-            throw new BadRequestException("Номер страницы не должен превышать общее число онных - 1");
+        if (friendsPage.getTotalPages() <= pageInfo.getPageNumber() - 1 && friendsPage.getTotalPages() != 0) {
+            throw new BadRequestException("Номер страницы не должен превышать общее число онных");
         }
 
         return PageMapper.pageToOutputPageDto(friendsPage, fullNameList);
