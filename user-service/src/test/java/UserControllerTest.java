@@ -1,6 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.CommonSecurityConfig;
+import com.ithirteeng.messengerapi.common.security.EnableSpringSecurity;
 import com.ithirteeng.messengerapi.common.security.jwt.JwtAuthentication;
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
 import com.ithirteeng.messengerapi.user.dto.GetProfileDto;
@@ -51,6 +52,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@EnableSpringSecurity
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = com.ithirteeng.messengerapi.user.UserServerApplication.class)

@@ -211,7 +211,7 @@ public class ChatService {
      * @return список объектов {@link PageChatDto}
      * @throws NotFoundException в случае, если сообщения не существует
      */
-    public List<PageChatDto> entitiesListToPageDtoList(List<ChatEntity> list) {
+    private List<PageChatDto> entitiesListToPageDtoList(List<ChatEntity> list) {
         ArrayList<PageChatDto> result = new ArrayList<>();
         for (ChatEntity entity : list) {
             UUID lastMessageId = entity.getLastMessageId();
@@ -241,7 +241,7 @@ public class ChatService {
      * @param <T>   любой тип данных
      * @return {@link List}
      */
-    public static <T> List<T> intersection(List<T> list1, List<T> list2) {
+    private static <T> List<T> intersection(List<T> list1, List<T> list2) {
         List<T> list = new ArrayList<>();
 
         for (T t : list1) {
