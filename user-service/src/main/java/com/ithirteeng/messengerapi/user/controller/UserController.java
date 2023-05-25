@@ -4,6 +4,7 @@ import com.ithirteeng.messengerapi.common.enums.NotificationType;
 import com.ithirteeng.messengerapi.common.model.CreateNotificationDto;
 import com.ithirteeng.messengerapi.common.model.UserDto;
 import com.ithirteeng.messengerapi.common.security.jwt.JwtUserDetails;
+import com.ithirteeng.messengerapi.common.security.utils.SecurityUtil;
 import com.ithirteeng.messengerapi.user.dto.*;
 import com.ithirteeng.messengerapi.user.mapper.PageMapper;
 import com.ithirteeng.messengerapi.user.mapper.UserMapper;
@@ -84,24 +85,22 @@ public class UserController {
      * Метод для получения данных профиля пользователя по данным
      *
      * @param dto            ДТО ({@link GetProfileDto}) для получения данных профиля
-     * @param authentication {@link Authentication}
      * @return {@link UserDto}
      */
     @GetMapping("/profile")
-    public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto, Authentication authentication) {
-        var userData = (JwtUserDetails) authentication.getPrincipal();
+    public UserDto getProfileData(@Validated @RequestBody GetProfileDto dto) {
+        var userData = SecurityUtil.getUserData();
         return userService.getUserData(dto.getLogin(), userData.getId());
     }
 
     /**
      * Метод для получения данных профиля пользователя
      *
-     * @param authentication {@link Authentication}
      * @return {@link UserDto}
      */
     @GetMapping("/me")
-    public UserDto getUserData(Authentication authentication) {
-        var userData = (JwtUserDetails) authentication.getPrincipal();
+    public UserDto getUserData() {
+        var userData = SecurityUtil.getUserData();
         return UserMapper.entityToUserDto(userService.findUserEntityById(userData.getId()));
     }
 
@@ -109,16 +108,11 @@ public class UserController {
      * Методя для изменения данных пользователя
      *
      * @param updateProfileDto ДТО ({@link UpdateProfileDto}) для изменения данных поьзователя
-     * @param authentication   {@link Authentication}
      * @return {@link UserDto}
      */
     @PutMapping("/profile/change")
-    public UserDto changeProfileData(
-            @Validated @RequestBody UpdateProfileDto updateProfileDto,
-            Authentication authentication
-    ) {
-        var userData = (JwtUserDetails) authentication.getPrincipal();
-
+    public UserDto changeProfileData(@Validated @RequestBody UpdateProfileDto updateProfileDto) {
+        var userData = SecurityUtil.getUserData();
         return userService.updateProfile(updateProfileDto, userData.getLogin());
 
     }
